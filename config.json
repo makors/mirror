@@ -1,6 +1,11 @@
 {
   "token": "INSERT_YOUR_TOKEN_HERE",
   "status": "offline",
+  "custom_profile": {
+    "enabled": false,
+    "username": "Example Username",
+    "avatar_url": "https://cdn.discordapp.com/embed/avatars/0.png"
+  },
   "mirrors": [
     {
       "channel_ids": [

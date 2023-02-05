@@ -37,6 +37,16 @@ function parseWebhookId(webhookUrl) {
   return webhookUrl.substring(indexStart + 1, indexEnd);
 }
 
+class CustomProfile {
+  constructor() {
+    this.enabled = false;
+    this.username = '';
+    this.avatarURL = '';
+  }
+}
+
+const customProfile = new CustomProfile()
+
 /*
 * Key = Channel id where when a message is sent, it is replicated to the webhooks.
 * Value = Array of webhooks where the message is replicated.
@@ -57,6 +67,14 @@ function loadConfigValues() {
     for (const channelId of mirror['channel_ids']) {
       channelWebhookMapping[channelId] = webhooks;
     }
+  }
+
+  const profile = config['custom_profile'];
+
+  if (profile && profile['enabled']) {
+    customProfile.enabled = true;
+    customProfile.username = profile['username'];
+    customProfile.avatarURL = profile['avatar_url'];
   }
 }
 
@@ -123,11 +141,14 @@ client.on('messageCreate', async (message) => {
     message.content += '\n' + attachment[1].url;
   }
 
+  const username = customProfile.enabled ? customProfile.username : message.author.username;
+  const avatarURL = customProfile.enabled ? customProfile.avatarURL : message.author.avatarURL();
+
   for (const webhook of webhooks) {
     webhook.send({
       content: message.content,
-      username: message.author.username,
-      avatarURL: message.author.avatarURL(),
+      username: username,
+      avatarURL: avatarURL,
       embeds: message.embeds
     }).catch(console.error);
   }
