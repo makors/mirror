@@ -3,7 +3,7 @@ Make your account behave like a bot and mirror messages from a server to another
 I take no responsibility for using this bot against Discord TOS.
 
 ## Features
-- **Send messages disguised as the original sender.**
+- **Send mirrored messages disguised as the original sender or with a custom profile.**
 - **Replace mentions of mirrored messages to match a valid mention on your server.**
 - **Allow customization of status (online, invisible, idle, busy).**
 - **Allow mirroring one or more messages to one or more webhooks.**
