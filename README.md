@@ -31,6 +31,11 @@ Mirrored message (to server B):\
 {
   "token": "INSERT_YOUR_TOKEN_HERE",
   "status": "offline",
+  "custom_profile": {
+    "enabled": false,
+    "username": "Example Username",
+    "avatar_url": "https://cdn.discordapp.com/embed/avatars/0.png"
+  },
   "mirrors": [
     {
       "channel_ids": [
@@ -57,6 +62,11 @@ Mirrored message (to server B):\
 
 `status:` is the status of the account that will mirror: online, offline, idle or dnd. (Note that you must not be logged in the account while the bot starts for this option to take place).
 
+`custom_profile:`
+- `enabled:` whether to send messages using a custom profile instead of being disguised as the author of the message.
+- `username`: name of the profile.
+- `avatar_url`: URL of the image to use as profile avatar.
+
 `mirrors:`
 - `channel_ids:` list of channel IDs where when a message is sent, it is mirrored. (you can get the ID of a channel by enabling the **Developer mode** in your discord settings and **Right-Click** -> **Copy ID** on a channel).
 - `webhooks_urls`: list of webhooks URLs where the mirrored message is sent. (you can create a webhook for a channel in your discord server with **Right-Click** -> **Integrations** -> **Create webhook**).
@@ -71,6 +81,11 @@ Mirrored message (to server B):\
 {
   "token": "rMQ3QFqk9sJVqpmQ2ZEe95JKscSOg9hAT5UBRps13rODuIUSeg",
   "status": "offline",
+  "custom_profile": {
+    "enabled": false,
+    "username": "Example Username",
+    "avatar_url": "https://cdn.discordapp.com/embed/avatars/0.png"
+  },
   "mirrors": [
     {
       "channel_ids": [
