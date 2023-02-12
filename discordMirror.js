@@ -121,7 +121,7 @@ client.on('messageCreate', async (message) => {
   const mentionLength = "<#000000000000000000>".length;
   
   // Only attempt to replace mentions on messages that could contain one.
-  if (message.content.length > mentionLength) {
+  if (message.content.length >= mentionLength) {
     const mentionReplaceList = config['mentions'][message.guildId];
   
     if (mentionReplaceList) {
