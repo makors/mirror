@@ -64,13 +64,11 @@ Mirrored message (to server B):\
 You can add as many mirrors as you like, for example:
 ```json
 "mirrors": [
-   // Mirror 1
    {
       "use_webhook_profile": false,
       "channel_ids": [],
       "webhook_urls": []
    },
-   // Mirror 2
    {
       "use_webhook_profile": false,
       "channel_ids": [],
@@ -88,12 +86,10 @@ You can add as many servers and as many mappings per server as you like, for exa
 ```json
 "mentions": {
    "SERVER_ID_1": [
-      // Mapping 1
       {
          "original": "MENTION_1",
          "replaced": "MENTION_2"
       },
-      // Mapping 2
       {
          "original": "MENTION_3",
          "replaced": "MENTION_4"
