@@ -44,7 +44,7 @@ Mirrored message (to server B):\
       "INSERT_ORIGINAL_SERVER_ID_HERE": [
          {
             "original": "INSERT_ORIGINAL_MENTION_ID_HERE",
-            "replaced": "INSERT_REAPLCED_MENTION_ID_HERE"
+            "replaced": "INSERT_REPLACED_MENTION_ID_HERE"
          }
       ]
    }
