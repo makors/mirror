@@ -1,0 +1,16 @@
+{
+   "token": "rMQ3QFqk9sJVqpmQ2ZEe95JKscSOg9hAT5UBRps13rODuIUSeg",
+   "status": "online",
+   "mirrors": [
+      {
+         "use_webhook_profile": false,
+         "channel_ids": [
+            "2482071287"
+         ],
+         "webhook_urls": [
+            "https://discord.com/api/webhooks/2348239058/poMQ3QFqk9sJVqpmQADa1Og9hAT5UBRps13rODXX928"
+         ]
+      }
+   ],
+   "mentions": {}
+}

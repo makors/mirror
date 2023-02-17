@@ -1,0 +1,43 @@
+{
+   "token": "rMQ3QFqk9sJVqpmQ2ZEe95JKscSOg9hAT5UBRps13rODuIUSeg",
+   "status": "online",
+   "mirrors": [
+      {
+         "use_webhook_profile": false,
+         "channel_ids": [
+            "2482071287"
+         ],
+         "webhook_urls": [
+            "https://discord.com/api/webhooks/2348239058/poMQ3QFqk9sJVqpmQADa1Og9hAT5UBRps13rODXX928"
+         ]
+      },
+      {
+         "use_webhook_profile": false,
+         "channel_ids": [
+            "2342342351"
+         ],
+         "webhook_urls": [
+            "https://discord.com/api/webhooks/5252011493/oafyh9ADHGUIhd281ADNnfijabhfi01941242xXi934",
+            "https://discord.com/api/webhooks/2342355210/aiwduodUAoIDUAh3892yranJKXHJha2801aopadksh6"
+         ]
+      }
+   ],
+   "mentions": {
+      "1327124981": [
+         {
+            "original": "5829920234",
+            "replaced": "2058208010"
+         }
+      ],
+      "0124956746": [
+         {
+            "original": "2123546501",
+            "replaced": "1234571908"
+         },
+         {
+            "original": "9124129659",
+            "replaced": "0124179189"
+         }
+      ]
+   }
+}

@@ -1,27 +1,23 @@
 {
-  "token": "INSERT_YOUR_TOKEN_HERE",
-  "status": "offline",
-  "custom_profile": {
-    "enabled": false,
-    "username": "Example Username",
-    "avatar_url": "https://cdn.discordapp.com/embed/avatars/0.png"
-  },
-  "mirrors": [
-    {
-      "channel_ids": [
-        "INSERT_CHANNEL_ID_HERE"
-      ],
-      "webhooks_urls": [
-        "INSERT_WEBHOOK_URL_HERE"
-      ]
-    }
-  ],
-  "mentions": {
-    "INSERT_SERVER_ID_HERE": [
+   "token": "INSERT_YOUR_DISCORD_TOKEN_HERE",
+   "status": "online",
+   "mirrors": [
       {
-        "original": "INSERT_ORIGINAL_ID_HERE",
-        "replaced": "INSERT_REPLACED_ID_HERE"
+         "use_webhook_profile": false,
+         "channel_ids": [
+            "INSERT_CHANNEL_ID_TO_MIRROR_HERE"
+         ],
+         "webhook_urls": [
+            "INSERT_DESTINATION_WEBHOOK_URL_HERE"
+         ]
       }
-    ]
-  }
+   ],
+   "mentions": {
+      "INSERT_ORIGINAL_SERVER_ID_HERE": [
+         {
+            "original": "INSERT_ORIGINAL_MENTION_ID_HERE",
+            "replaced": "INSERT_REAPLCED_MENTION_ID_HERE"
+         }
+      ]
+   }
 }

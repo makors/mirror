@@ -1,19 +1,8 @@
 {
-  "name": "discord-mirror",
-  "version": "1.0.0",
-  "description": "Make your account behave like a bot and mirror messages from a server to another.",
-  "main": "discordMirror.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/crimilo/Discord-Mirror.git"
+  "scripts": {
+    "start": "node --no-warnings src/index.js"
   },
-  "author": "crimilo",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/crimilo/Discord-Mirror/issues"
-  },
-  "homepage": "https://github.com/crimilo/Discord-Mirror#readme",
   "dependencies": {
-    "discord.js-selfbot-v13": "^2.9.15"
+    "discord.js-selfbot-v13": "^2.10.6"
   }
 }
