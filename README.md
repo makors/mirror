@@ -59,7 +59,7 @@ Mirrored message (to server B):\
 `mirrors:` list of mirrors. A mirror is a section containing the following options:
    - `use_webhook_profile`: whether to use the profile of the webhook instead of being disguised as the message author for this mirror.
    - `channel_ids:` list of channel IDs for this mirror. When a message is sent in one of this channels, it is mirrored to all the webhooks in this mirror. (You can get the ID of a channel by enabling the **Developer mode** in your discord settings and **Right-Click** -> **Copy ID** on a channel).
-   - `webhooks_urls:` list of webhook URLs for this mirror. (You can create a webhook for a channel in your discord server with **Right-Click** -> **Integrations** -> **Create webhook**).
+   - `webhook_urls:` list of webhook URLs for this mirror. (You can create a webhook for a channel in your discord server with **Right-Click** -> **Integrations** -> **Create webhook**).
 
 You can add as many mirrors as you like, for example:
 ```json
