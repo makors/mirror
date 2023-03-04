@@ -4,6 +4,7 @@
    "mirrors": [
       {
          "use_webhook_profile": false,
+         "message_to_mirror_must_contain_embeds": false,
          "channel_ids": [
             "2482071287"
          ],
@@ -13,6 +14,7 @@
       },
       {
          "use_webhook_profile": false,
+         "message_to_mirror_must_contain_embeds": true,
          "channel_ids": [
             "2342342351"
          ],
@@ -39,5 +41,9 @@
             "replaced": "0124179189"
          }
       ]
-   }
+   },
+   "ignored_user_ids": [
+      "1241225652",
+      "2384022301"
+   ]
 }

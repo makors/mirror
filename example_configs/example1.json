@@ -4,6 +4,7 @@
    "mirrors": [
       {
          "use_webhook_profile": false,
+         "message_to_mirror_must_contain_embeds": true,
          "channel_ids": [
             "2482071287",
             "4872389911",
@@ -21,5 +22,6 @@
             "replaced": "2058208010"
          }
       ]
-   }
+   },
+   "ignored_user_ids": []
 }

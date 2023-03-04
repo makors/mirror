@@ -4,6 +4,7 @@
    "mirrors": [
       {
          "use_webhook_profile": false,
+         "message_to_mirror_must_contain_embeds": false,
          "channel_ids": [
             "2482071287"
          ],
@@ -12,5 +13,6 @@
          ]
       }
    ],
-   "mentions": {}
+   "mentions": {},
+   "ignored_user_ids": []
 }

@@ -7,6 +7,7 @@ module.exports = class MirrorClient extends Client {
    constructor(options) {
       super(options);
       this.mirrors = this.loadMirrors();
+      this.ignoredUsers = this.loadIgnoredUsers();
       this.bindEvents();
    }
 
@@ -15,7 +16,11 @@ module.exports = class MirrorClient extends Client {
 
       for (const mirror of config['mirrors']) {
          const webhooks = mirror['webhook_urls'].map(webhookUrl => {
-            return new MirrorWebhook({ data: { url: webhookUrl }, useCustomProfile: mirror['use_webhook_profile'] });
+            return new MirrorWebhook({ 
+               data: { url: webhookUrl },
+               useCustomProfile: mirror['use_webhook_profile'],
+               messageMustContainEmbeds: mirror['message_to_mirror_must_contain_embeds']
+            });
          });
 
          for (const channelId of mirror['channel_ids']) {
@@ -24,6 +29,14 @@ module.exports = class MirrorClient extends Client {
       }
 
       return mirrors;
+   }
+
+   loadIgnoredUsers() {
+      return new Set([...config['ignored_user_ids']]);
+   }
+
+   isIgnoredUser(user) {
+      return this.ignoredUsers.has(user.id);
    }
 
    bindEvents() {
@@ -41,6 +54,10 @@ module.exports = class MirrorClient extends Client {
          return;
       }
 
+      if (this.isIgnoredUser(message.author)) {
+         return;
+      }
+
       const webhooks = this.mirrors[message.channelId];
 
       if (!webhooks) {
@@ -54,6 +71,10 @@ module.exports = class MirrorClient extends Client {
       }
 
       for (const webhook of webhooks) {
+         if (webhook.messageMustContainEmbeds && !message.embeds.length) {
+            continue;
+         }
+
          webhook.send({
             content: message.content.length ? message.content : null,
             files: [...message.attachments.values()],

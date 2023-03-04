@@ -4,6 +4,7 @@
    "mirrors": [
       {
          "use_webhook_profile": false,
+         "message_to_mirror_must_contain_embeds": false,
          "channel_ids": [
             "INSERT_CHANNEL_ID_TO_MIRROR_HERE"
          ],
@@ -19,5 +20,8 @@
             "replaced": "INSERT_REPLACED_MENTION_ID_HERE"
          }
       ]
-   }
+   },
+   "ignored_user_ids": [
+      "INSERT_ID_OF_USER_NOT_TO_MIRROR"
+   ]
 }
