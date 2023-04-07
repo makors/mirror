@@ -1,133 +1,169 @@
 # Discord Mirror
-Make your account behave like a bot and mirror messages from a server to another (through webhooks).\
-I take no responsibility for using this bot against Discord TOS.
 
-## Features
-- Send mirrored messages disguised as the original sender or using a webhook profile.
-- Replace mentions of mirrored messages to match a valid mention on your server.
-- Allow customization of status for the mirroring account (online, invisible, idle, busy).
-- Allow mirroring all types of files.
-- Allow mirroring one or more channels to one or more webhooks.
-- Optionally do not mirror messages from specific users.
+Make your account behave like a bot and mirror messages from a server to another through webhooks.
 
 ## Showcase
+
 > Original message (from server A):\
 ![](https://i.imgur.com/ogelJ23.png)\
 Mirrored message (to server B):\
 ![](https://i.imgur.com/C42OT64.png)
 
-## How to use
-1. Install [NodeJS](https://nodejs.org/en/download/).
+## Main Features
+
+- Replace mentions and other content in the message with the desired replacement.
+- Disguise mirrored messages as the original sender or use a custom webhook profile.
+- Prevent specific users from being mirrored.
+- Support mirroring as many channels as you want to as many webhooks as you want.
+
+## How To Use
+1. Install [NodeJS](https://nodejs.org/en/download).
 2. Clone this repository.
-3. Enter the project folder and:
-   - Run: `npm install` to install the dependencies.
-   - Configure `config.json` (see below).
-4. Run: `npm start` to start the bot.
-5. You are now mirroring! >:)
+3. Navigate to the project folder and run `npm install` to install the dependencies.
+4. Run `npm run compile` to compile the bot.
+5. Configure `config.json` (see Configuration guide below).
+5. Run `npm start` to start the bot.
 
-## Configuration guide
+## Configuration Guide
+
+### **Token**
+
 ```json
-{
-   "token": "INSERT_YOUR_DISCORD_TOKEN_HERE",
-   "status": "online",
-   "mirrors": [
-      {
-         "use_webhook_profile": false,
-         "message_to_mirror_must_contain_embeds": false,
-         "channel_ids": [
-            "INSERT_CHANNEL_ID_TO_MIRROR_HERE"
-         ],
-         "webhook_urls": [
-            "INSERT_DESTINATION_WEBHOOK_URL_HERE"
-         ]
-      }
-   ],
-   "mentions": {
-      "INSERT_ORIGINAL_SERVER_ID_HERE": [
-         {
-            "original": "INSERT_ORIGINAL_MENTION_ID_HERE",
-            "replaced": "INSERT_REPLACED_MENTION_ID_HERE"
-         }
-      ]
-   },
-   "ignored_user_ids": [
-      "INSERT_ID_OF_USER_NOT_TO_MIRROR"
-   ]
-}
+"token": "INSERT_YOUR_DISCORD_TOKEN_HERE"
 ```
-`token:` token of the discord account that will mirror. Learn how to find your token [here](https://www.androidauthority.com/get-discord-token-3149920/).\
-<small>(Note that the token must be that of a personal discord account and not a bot).</small>
 
-`status:` status of the account that will mirror: `online`, `offline`, `idle` or `dnd`.\
-<small>(Note that you must not be logged in the account while the bot starts for this option to take place).</small>
+The token of the personal Discord account that will mirror messages. Learn how to find your account token [here](https://www.androidauthority.com/get-discord-token-3149920/).
 
-`mirrors:` list of mirrors. A mirror is a section containing the following options:
-   - `use_webhook_profile`: whether to use the profile of the webhook instead of being disguised as the message author for this mirror.
-   - `message_to_mirror_must_contain_embeds`: whether to mirror only messages containing at least one embed for this mirror ([btw this is an embed](https://i.imgur.com/t3wTjiP.png)).
-   - `channel_ids:` list of channel IDs for this mirror. When a message is sent in one of this channels, it is mirrored to all the webhooks in this mirror.\
-   <small>(You can get the ID of a channel by enabling the **Developer mode** in your discord settings and **Right-Click** -> **Copy ID** on a channel).</small>
-   - `webhooks_urls:` list of webhook URLs for this mirror.\
-   <small>(You can create a webhook for a channel in your discord server with **Right-Click** -> **Integrations** -> **Create webhook**).</small>
+### **Status**
 
-You can add as many mirrors as you like, for example:
+```json
+"status": "online"
+```
+
+The status of account that will mirror messages. The available options are: `online`, `offline`, `idle` or `dnd`.
+
+### **Log Message**
+
+```json
+"log_message": "[<date>] Mirrored <author>'s message from <server>."
+```
+
+Message sent in the console when a message is mirrored. The following placeholders can be used:
+- `<date>`: the date and time when the message was sent.
+- `<author>`: the username and discriminator of the message author.
+- `<server>`: the name of the server where the message was originally sent.
+
+### **Mirrors**
+
 ```json
 "mirrors": [
    {
-      "use_webhook_profile": false,
-      "channel_ids": [],
-      "webhook_urls": []
-   },
-   {
-      "use_webhook_profile": false,
-      "channel_ids": [],
-      "webhook_urls": []
+      "channel_ids": [
+         "INSERT_CHANNEL_ID_TO_MIRROR_HERE"
+      ],
+      "webhook_urls": [
+         "INSERT_DESTINATION_WEBHOOK_URL_HERE"
+      ]
    }
 ]
 ```
 
-`mentions:` is a section containing mappings of mentions that must be replaced in mirrored messages.
-   - `"INSERT_ORIGINAL_SERVER_ID_HERE":` ID of the server where the message contaning the mention to replace was sent.
-      - `original:` ID of the role/channel in the original server.
-      - `replaced:` ID of the role/channel in the destination server.
+List of mirror configurations. Each mirror configuration describes a set of channels to mirror and destination webhooks to send the mirrored messages to. You can add as many mirrors as you like, for example:
 
-<small>You can get the ID of a server by enabling the **Developer mode** in your discord settings and **Right-Click** -> **Copy ID** on a server. The same applies for a role, a user or a channel.</small>
-
-You can add as many servers and as many mappings per server as you like, for example:
 ```json
-"mentions": {
-   "SERVER_ID_1": [
+"mirrors": [
+   {
+      "channel_ids": ["INSERT_CHANNEL_ID_TO_MIRROR_HERE"],
+      "webhook_urls": ["INSERT_DESTINATION_WEBHOOK_URL_HERE"]
+   },
+   {
+      "channel_ids": ["INSERT_CHANNEL_ID_TO_MIRROR_HERE"],
+      "webhook_urls": ["INSERT_DESTINATION_WEBHOOK_URL_HERE"]
+   }
+]
+```
+
+A mirror can also contain additional options:
+
+### **Mirror** → **Ignored users**
+
+```json
+"ignored_user_ids": [
+   "INSERT_USER_ID_NOT_TO_MIRROR_HERE"
+]
+```
+
+List of user IDs of users whose messages should not be mirrored.
+
+### **Mirror** → **Requirements**
+
+```json
+"requirements": {
+   "min_embeds_count": 0,
+   "min_content_length": 0,
+   "min_attachments_count": 0
+}
+```
+Requirements that a message must meet to be mirrored.
+
+### **Mirror** → **Options**
+
+```json
+"options": {
+   "use_webhook_profile": false,
+   "remove_attachments": false,
+   "mirror_messages_from_bots": true,
+   "mirror_reply_messages": true
+}
+```
+
+Options that control how the bot should mirror messages.
+- `use_webhook_profile`: if true, the webhook's profile picture and name will be used for the mirrored message. If false, the message author's profile picture and name will be used.
+- `remove_attachments`: if true, attachments will be removed from the mirrored message.
+- `mirror_messages_from_bots`: if true, messages from bots will be mirrored. If false, they will not.
+- `mirror_reply_messages`: if true, messages that are replies to another message will be mirrored. If false, they will not.
+
+### **Mirror** → **Replacements**
+
+```json
+"replacements": {
+   "content": [
       {
-         "original": "MENTION_1",
-         "replaced": "MENTION_2"
-      },
-      {
-         "original": "MENTION_3",
-         "replaced": "MENTION_4"
-      }
-   ],
-   "SERVER_ID_2": [
-      {
-         "original": "MENTION_5",
-         "replaced": "MENTION_6"
+         "replace": "INSERT_TEXT_TO_REPLACE_HERE",
+         "with": "INSERT_REPLACEMENT_TEXT_HERE"
       }
    ]
 }
 ```
-If you don't need to replace mentions, you can leave `mentions:` empty like follows:
+
+The replacements section is used to define the substitutions that need to be made in the mirrored message. For example, if you want to replace the word "apple" with "orange", you can define a content replacement like this:
+
 ```json
-"mentions": {}
+"replacements": {
+   "content": [
+      {
+         "replace": "apple",
+         "with": "orange"
+      }
+   ]
+}
 ```
 
-`ignored_user_ids:` is a list of users not to mirror. For example:
+To replace mentions and ensure a valid reference on the mirrored server, you can define a content replacement like this:
+
 ```json
-"ignored_user_ids": [
-   "123",
-   "456"
-]
-```
-If you don't need to ignore users, you can leave `ignored_user_ids:` empty like follows:
-```json
-"ignored_user_ids": []
+"replacements": {
+   "content": [
+      {
+         "replace": "ORIGINAL_ROLE_OR_USER_OR_CHANNEL_ID",
+         "with": "REPLACED_ROLE_OR_USER_OR_CHANNEL_ID"
+      }
+   ]
+}
 ```
 
-If you're somehow still unsure how to configure the bot, check out the examples in `example_configs/`.
+Check `config.json` for all the available replacements. Also, you can find valid config examples in the `example_configs/` folder.
+
+## Disclaimer
+
+Note that using a Discord Self Bot is against the [Discord TOS](https://discord.com/terms), and the creator of this bot takes no responsibility for any consequences that may arise from using it.

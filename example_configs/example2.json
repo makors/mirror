@@ -1,49 +1,42 @@
 {
-   "token": "rMQ3QFqk9sJVqpmQ2ZEe95JKscSOg9hAT5UBRps13rODuIUSeg",
-   "status": "online",
+   "token": "abcdefghijklmnopqrstuvwxyz",
+   "status": "dnd",
+   "log_message": "[<date>] Mirrored <author>'s message from <server>.",
    "mirrors": [
       {
-         "use_webhook_profile": false,
-         "message_to_mirror_must_contain_embeds": false,
          "channel_ids": [
-            "2482071287"
+            "0122367467",
+            "3729837293",
+            "1204723987"
          ],
          "webhook_urls": [
-            "https://discord.com/api/webhooks/2348239058/poMQ3QFqk9sJVqpmQADa1Og9hAT5UBRps13rODXX928"
-         ]
-      },
-      {
-         "use_webhook_profile": false,
-         "message_to_mirror_must_contain_embeds": true,
-         "channel_ids": [
-            "2342342351"
+            "https://discord.com/api/webhooks/2342367888/abcdefghijklmnopqrstuvwxyz"
          ],
-         "webhook_urls": [
-            "https://discord.com/api/webhooks/5252011493/oafyh9ADHGUIhd281ADNnfijabhfi01941242xXi934",
-            "https://discord.com/api/webhooks/2342355210/aiwduodUAoIDUAh3892yranJKXHJha2801aopadksh6"
-         ]
-      }
-   ],
-   "mentions": {
-      "1327124981": [
-         {
-            "original": "5829920234",
-            "replaced": "2058208010"
-         }
-      ],
-      "0124956746": [
-         {
-            "original": "2123546501",
-            "replaced": "1234571908"
+         "options": {
+            "use_webhook_profile": true
          },
-         {
-            "original": "9124129659",
-            "replaced": "0124179189"
+         "replacements": {
+            "content": [
+               {
+                  "replace": "facebook",
+                  "with": "instagram"
+               }
+            ],
+            "embed": {
+               "title": [
+                  {
+                     "replace": "facebook",
+                     "with": "instagram"
+                  }   
+               ],
+               "description": [
+                  {
+                     "replace": "facebook",
+                     "with": "instagram"
+                  }   
+               ]
+            }
          }
-      ]
-   },
-   "ignored_user_ids": [
-      "1241225652",
-      "2384022301"
+      }
    ]
 }
