@@ -20,6 +20,10 @@
                {
                   "replace": "facebook",
                   "with": "instagram"
+               },
+               {
+                  "replace": "2389723983",
+                  "with": "2349280239"
                }
             ],
             "embed": {
@@ -33,6 +37,12 @@
                   {
                      "replace": "facebook",
                      "with": "instagram"
+                  }   
+               ],
+               "author": [
+                  {
+                     "replace": "Example Bot",
+                     "with": "Discord Mirror Self Bot"
                   }   
                ]
             }

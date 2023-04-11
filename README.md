@@ -1,6 +1,6 @@
 # Discord Mirror
 
-Make your account behave like a bot and mirror messages from a server to another through webhooks.
+Make your account behave like a bot and mirror messages from a server to another (through webhooks).
 
 ## Showcase
 
@@ -26,34 +26,27 @@ Mirrored message (to server B):\
 
 ## Configuration Guide
 
-### **Token**
-
+**Token**: The token of the personal Discord account that will mirror messages. Learn how to find your account token [here](https://www.androidauthority.com/get-discord-token-3149920/).
 ```json
 "token": "INSERT_YOUR_DISCORD_TOKEN_HERE"
 ```
 
-The token of the personal Discord account that will mirror messages. Learn how to find your account token [here](https://www.androidauthority.com/get-discord-token-3149920/).
-
-### **Status**
+**Status**: The status of account that will mirror messages. The available options are: `online`, `offline`, `idle` or `dnd`.
 
 ```json
 "status": "online"
 ```
 
-The status of account that will mirror messages. The available options are: `online`, `offline`, `idle` or `dnd`.
-
-### **Log Message**
+**Log Message**: Message sent in the console when a message is mirrored. The following placeholders can be used:
+- `<date>`: the date and time when the message was sent.
+- `<author>`: the username and discriminator of the message author.
+- `<server>`: the name of the server where the message was originally sent.
 
 ```json
 "log_message": "[<date>] Mirrored <author>'s message from <server>."
 ```
 
-Message sent in the console when a message is mirrored. The following placeholders can be used:
-- `<date>`: the date and time when the message was sent.
-- `<author>`: the username and discriminator of the message author.
-- `<server>`: the name of the server where the message was originally sent.
-
-### **Mirrors**
+**Mirrors**: List of mirror configurations. Each mirror configuration describes a set of channels to mirror and destination webhooks to send mirrored messages to.
 
 ```json
 "mirrors": [
@@ -68,24 +61,9 @@ Message sent in the console when a message is mirrored. The following placeholde
 ]
 ```
 
-List of mirror configurations. Each mirror configuration describes a set of channels to mirror and destination webhooks to send the mirrored messages to. You can add as many mirrors as you like, for example:
+Each mirror can also contain additional options:
 
-```json
-"mirrors": [
-   {
-      "channel_ids": ["INSERT_CHANNEL_ID_TO_MIRROR_HERE"],
-      "webhook_urls": ["INSERT_DESTINATION_WEBHOOK_URL_HERE"]
-   },
-   {
-      "channel_ids": ["INSERT_CHANNEL_ID_TO_MIRROR_HERE"],
-      "webhook_urls": ["INSERT_DESTINATION_WEBHOOK_URL_HERE"]
-   }
-]
-```
-
-A mirror can also contain additional options:
-
-### **Mirror** → **Ignored users**
+**Mirrors → Ignored users**: List of user IDs of users whose messages should not be mirrored.
 
 ```json
 "ignored_user_ids": [
@@ -93,9 +71,7 @@ A mirror can also contain additional options:
 ]
 ```
 
-List of user IDs of users whose messages should not be mirrored.
-
-### **Mirror** → **Requirements**
+**Mirrors → Requirements**: Requirements that a message must meet to be mirrored.
 
 ```json
 "requirements": {
@@ -104,9 +80,12 @@ List of user IDs of users whose messages should not be mirrored.
    "min_attachments_count": 0
 }
 ```
-Requirements that a message must meet to be mirrored.
 
-### **Mirror** → **Options**
+**Mirrors → Options**: Options that control how the bot should mirror messages.
+- `use_webhook_profile`: if true, the webhook's profile picture and name will be used for the mirrored message. If false, the message author's profile picture and name will be used.
+- `remove_attachments`: if true, attachments will be removed from the mirrored message.
+- `mirror_messages_from_bots`: if true, messages from bots will be mirrored. If false, they will not.
+- `mirror_reply_messages`: if true, messages that are replies to another message will be mirrored. If false, they will not.
 
 ```json
 "options": {
@@ -117,14 +96,7 @@ Requirements that a message must meet to be mirrored.
 }
 ```
 
-Options that control how the bot should mirror messages.
-- `use_webhook_profile`: if true, the webhook's profile picture and name will be used for the mirrored message. If false, the message author's profile picture and name will be used.
-- `remove_attachments`: if true, attachments will be removed from the mirrored message.
-- `mirror_messages_from_bots`: if true, messages from bots will be mirrored. If false, they will not.
-- `mirror_reply_messages`: if true, messages that are replies to another message will be mirrored. If false, they will not.
-
-### **Mirror** → **Replacements**
-
+**Mirrors → Replacements**: Replacements to perform in the mirrored message.
 ```json
 "replacements": {
    "content": [
@@ -136,20 +108,7 @@ Options that control how the bot should mirror messages.
 }
 ```
 
-The replacements section is used to define the substitutions that need to be made in the mirrored message. For example, if you want to replace the word "apple" with "orange", you can define a content replacement like this:
-
-```json
-"replacements": {
-   "content": [
-      {
-         "replace": "apple",
-         "with": "orange"
-      }
-   ]
-}
-```
-
-To replace mentions and ensure a valid reference on the mirrored server, you can define a content replacement like this:
+To replace @mentions and ensure a valid reference on the mirrored server, you can define a content replacement like this:
 
 ```json
 "replacements": {
@@ -162,7 +121,7 @@ To replace mentions and ensure a valid reference on the mirrored server, you can
 }
 ```
 
-Check `config.json` for all the available replacements. Also, you can find valid config examples in the `example_configs/` folder.
+Check `config.json` for all the available replacements. Also, You can find valid config examples in the `example_configs/` folder.
 
 ## Disclaimer
 

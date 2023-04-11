@@ -70,8 +70,8 @@
                ],
                "color": [
                   {
-                     "replace": "INSERT_COLOR_TO_REPLACE_HERE",
-                     "with": "INSERT_REPLACED_COLOR_HERE"
+                     "replace": "INSERT_HEX_COLOR_TO_REPLACE_HERE",
+                     "with": "INSERT_REPLACED_HEX_COLOR_HERE"
                   }
                ],
                "field_name": [
