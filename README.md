@@ -46,7 +46,7 @@ Mirrored message (to server B):\
 "log_message": "[<date>] Mirrored <author>'s message from <server>."
 ```
 
-**Mirrors**: List of mirror configurations. Each mirror configuration describes a set of channels to mirror and destination webhooks to send mirrored messages to.
+**Mirrors**: List of mirror configurations. Each mirror configuration describes a set of channels to mirror and destination webhooks to send mirrored messages to. (A webhook can be created for a channel with: **Right-click** -> **Edit channel** -> **Integrations** -> **Create webhook**.)
 
 ```json
 "mirrors": [
