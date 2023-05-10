@@ -1,5 +1,5 @@
 import { Client, ClientOptions, Message, PresenceStatusData } from 'discord.js-selfbot-v13';
-import { isDirectMessage, isSystemMessage, isVisibleOnlyByClient, containsOnlyAttachments } from './messageUtils';
+import { isDirectMessage, isSystemMessage, isVisibleOnlyByClient, containsOnlyAttachments, containsOnlyStickers } from './messageUtils';
 import { Mirror, MirrorOptions } from './mirror';
 import config from '../config.json';
 
@@ -38,7 +38,7 @@ export class MirrorClient extends Client {
    }
 
    private onMessage(message: Message): void {
-      if (isSystemMessage(message) || isDirectMessage(message) || isVisibleOnlyByClient(message)) {
+      if (isSystemMessage(message) || isDirectMessage(message) || isVisibleOnlyByClient(message) || containsOnlyStickers(message)) {
          return;
       }
 
