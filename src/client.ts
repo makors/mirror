@@ -65,11 +65,12 @@ export class MirrorClient extends Client {
       }
 
       mirror.processMessageReplacements(message);
-      mirror.mirrorMessageToWebhooks(message);
-      
-      if (config.log_message && config.log_message.length) {
-         this.logMessageMirrored(message);
-      }
+
+      mirror.mirrorMessageToWebhooks(message, () => {
+         if (config.log_message && config.log_message.length) {
+            this.logMessageMirrored(message);
+         }
+      });
    }
 
    private logMessageMirrored(message: Message): void {

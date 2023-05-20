@@ -78,15 +78,45 @@ export class Mirror {
       this.replacements?.processMessage(message);
    }
 
-   public mirrorMessageToWebhooks(message: Message): void {
+   public mirrorMessageToWebhooks(message: Message, successCallback: () => void): void {
+      let mirroredMessagesCount = 0;
+
       for (const webhook of this.webhooks) {
-         webhook.send({
-            content: message.content.length ? message.content : null,
-            files: [...message.attachments.values()],
-            username: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileName : message.author.username,
-            avatarURL: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileAvatarUrl : message.author.displayAvatarURL(),
-            embeds: message.embeds
-         });
+         const maxContentLengthPerMessage = 2000;
+         const partialMessagesCount = Math.floor(message.content.length / (maxContentLengthPerMessage + 1)) + 1;
+         let sendFailed = false;
+
+         const sendPartialMessageCallback = (i: number) => {
+            if (sendFailed) {
+               return;
+            }
+
+            const start = i * maxContentLengthPerMessage;
+            const end = start + maxContentLengthPerMessage;
+
+            webhook.send({
+               content: message.content.length ? message.content.substring(start, end) : null,
+               username: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileName : message.author.username,
+               avatarURL: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileAvatarUrl : message.author.displayAvatarURL(),
+               files: !i ? [...message.attachments.values()] : [],
+               embeds: !i ? message.embeds : undefined
+            })
+            .then(() => {
+               if (!i && ++mirroredMessagesCount == this.webhooks.length) {
+                  successCallback();
+               }
+            })
+            .catch(error => {
+               console.error(`Failed to mirror a message (partial ${i + 1}/${partialMessagesCount}): ${error}`)
+               sendFailed = true;
+            });
+         }
+
+         sendPartialMessageCallback(0);
+
+         for (let i = 1; i < partialMessagesCount; i++) {
+            setTimeout(sendPartialMessageCallback, 500, i);
+         }
       }
    }
    
