@@ -1,31 +1,3 @@
-# Discord Mirror
-Make your account behave like a bot and mirror messages from a server to another (through webhooks).
-
-# Showcase
-
-> Original message (from server A):\
-![](https://i.imgur.com/ogelJ23.png)\
-Mirrored message (to server B):\
-![](https://i.imgur.com/C42OT64.png)
-
-# Main Features
-
-- Replace mentions and other content before mirroring a message.
-- Disguise mirrored messages as the original author or use a custom webhook profile.
-- Support mirroring as many channels as you want to as many webhooks as you want.
-- Prevent specific users and roles from being mirrored.
-
-# How To Use
-1. Install [NodeJS](https://nodejs.org/en/download).
-2. Clone this repository.
-3. Navigate to the project folder and run `npm install` to install the dependencies.
-4. Run `npm run compile` to compile the bot.
-5. Configure `config.yml`.
-5. Run `npm start` to start the bot.
-
-# Configuration guide
-Each option in `config.yml` is either self explanatory or has a comment above describing it:
-```yml
 # Token of the personal Discord account that will mirror messages.
 # Learn how to find your account token here: https://www.androidauthority.com/get-discord-token-3149920/
 token: "insert_your_token_here"
@@ -94,8 +66,3 @@ mirrors:
    #     - "insert_channel_id_to_mirror_here"
    #   webhookUrls:
    #     - "insert_destionation_webhook_url_here"
-```
-
-# Disclaimer
-
-Note that using a Discord self bot is against the Discord TOS, and i take no responsibility for any consequences that may arise from using it.

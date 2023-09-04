@@ -1,146 +1,174 @@
-import { Message } from 'discord.js-selfbot-v13';
-import { MirrorWebhook } from './webhook';
-import { MessageReplacements } from './messageReplacements';
+import { Message, MessagePayload, WebhookClient, WebhookMessageOptions } from "discord.js-selfbot-v13";
+import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
+import { MirrorReplacements, ReplacementConfig } from "./replacements";
 
-type MirrorData = {
-   [key: string]: any
+interface MirrorConfigRequirements {
+   minEmbedsCount?: number;   
+   minContentLength?: number;   
+   minAttachmentsCount?: number;   
 }
 
-export class MirrorRequirements {
-   public minEmbedsCount: number = 0;
-   public minContentLength: number = 0;
-   public minAttachmentsCount: number = 0;
+interface MirrorConfigOptions {
+   useWebhookProfile?: boolean;
+   removeAttachments?: boolean;
+   mirrorMessagesFromBots?: boolean;
+   mirrorReplyMessages?: boolean;
+   mirrorMessagesOnEdit?: boolean;
 }
 
-export enum MirrorOptions {
-   UseWebhookProfile = 1 << 0,
-   RemoveMessageAttachments = 1 << 1,
-   MirrorMessagesFromBots = 1 << 2,
-   MirrorReplyMessages = 1 << 3
+export interface MirrorConfig {
+   channelIds: string[];
+   webhookUrls: string[];
+   ignoredUserIds?: string[];
+   ignoredRoleIds?: string[];
+   requirements?: MirrorConfigRequirements;
+   options?: MirrorConfigOptions;
+   replacements?: Record<number, ReplacementConfig>;
 }
 
+class MirrorRequirements {
+   public minEmbedsCount: number;
+   public minContentLength: number;
+   public minAttachmentsCount: number;
+
+   public constructor({
+      minEmbedsCount = 0,
+      minContentLength = 0,
+      minAttachmentsCount = 0,
+   }: MirrorConfigRequirements) {
+      this.minEmbedsCount = minEmbedsCount;
+      this.minContentLength = minContentLength;
+      this.minAttachmentsCount = minAttachmentsCount;
+   }
+}
+
+class MirrorOptions {
+   public useWebhookProfile: boolean;
+   public removeAttachments: boolean;
+   public mirrorMessagesFromBots: boolean;
+   public mirrorReplyMessages: boolean;
+   public mirrorMessagesOnEdit: boolean;
+
+   public constructor({
+      useWebhookProfile = false,
+      removeAttachments = false,
+      mirrorMessagesFromBots = true,
+      mirrorReplyMessages = true,
+      mirrorMessagesOnEdit = false
+   }: MirrorConfigOptions) {
+      this.useWebhookProfile = useWebhookProfile;
+      this.removeAttachments = removeAttachments;
+      this.mirrorMessagesFromBots = mirrorMessagesFromBots;
+      this.mirrorReplyMessages = mirrorReplyMessages;
+      this.mirrorMessagesOnEdit = mirrorMessagesOnEdit;
+   }
+}
+ 
 export class Mirror {
-   private webhooks: MirrorWebhook[] = [];
-   private ignoredUserIds: Set<string> = new Set();
-   private requirements: MirrorRequirements = new MirrorRequirements();
-   private options: MirrorOptions = MirrorOptions.MirrorMessagesFromBots;
-   private replacements: MessageReplacements | undefined;
+   private webhooks: WebhookClient[] = [];
+   private ignoredUserIds: Set<string>;
+   private ignoredRoleIds: string[];
+   private mirrorRequirements: MirrorRequirements;
+   private mirrorOptions: MirrorOptions;
+   private replacements: MirrorReplacements;
 
-   public constructor(data: MirrorData) {
-      this.fillMirrorData(data);
+   public constructor(mirrorConfig: MirrorConfig) {
+      this.loadWebhooks(mirrorConfig.webhookUrls)
+      this.ignoredUserIds = new Set(mirrorConfig.ignoredUserIds);
+      this.ignoredRoleIds = mirrorConfig.ignoredRoleIds ?? [];
+      this.mirrorRequirements = new MirrorRequirements(mirrorConfig.requirements ?? {})
+      this.mirrorOptions = new MirrorOptions(mirrorConfig.options ?? {})
+      this.replacements = new MirrorReplacements(mirrorConfig.replacements)
    }
 
-   private fillMirrorData(data: MirrorData): void {
-      if (data.options) {
-         if (data.options.use_webhook_profile) {
-            this.options |= MirrorOptions.UseWebhookProfile;
-         }
-   
-         if (data.options.remove_attachments) {
-            this.options |= MirrorOptions.RemoveMessageAttachments;
-         }
-   
-         if (data.options.mirror_messages_from_bots) {
-            this.options |= MirrorOptions.MirrorMessagesFromBots;
-         }
-   
-         if (data.options.mirror_reply_messages) {
-            this.options |= MirrorOptions.MirrorReplyMessages;
-         }
-      }
-
-      if (!data.webhook_urls || !data.webhook_urls.length) {
-         throw new Error("A mirror in the config does not have webhooks. A mirror must have at least one webhook.");
-      }
-
-      this.webhooks = data.webhook_urls.map((webhookUrl: string) => new MirrorWebhook(webhookUrl, <boolean><unknown>(this.options & MirrorOptions.UseWebhookProfile)));
-
-      if (data.ignored_user_ids) {
-         this.ignoredUserIds = new Set([...data.ignored_user_ids]);
-      }
-
-      if (data.requirements) {
-         this.requirements.minAttachmentsCount = data.requirements?.min_attachments_count ?? 0;
-         this.requirements.minContentLength = data.requirements?.min_content_length ?? 0;
-         this.requirements.minEmbedsCount = data.requirements?.min_embeds_count ?? 0;
-      }
-
-      if (data.replacements) {
-         this.replacements = new MessageReplacements(data.replacements);
-      }
+   public messageMeetsMirrorCriteria(message: Message): boolean {
+      return this.messageMeetsOptions(message) && this.messageMeetsRequirements(message);
    }
 
-   public isIgnoredUser(userId: string): boolean {
-      return this.ignoredUserIds.has(userId);
+   public stripMessage(message: Message): boolean {
+      if (this.mirrorOptions.removeAttachments) {
+         if (containsOnlyAttachments(message)) {
+            return false;
+         }
+         message.attachments.clear();
+      }
+      if (isGif(message)) {
+         message.embeds.pop();
+      }
+      return true;
    }
 
-   public processMessageReplacements(message: Message): void {
-      this.replacements?.processMessage(message);
+   public applyReplacements(message: Message): void {
+      this.replacements.apply(message);
    }
 
-   public mirrorMessageToWebhooks(message: Message, successCallback: () => void): void {
-      let mirroredMessagesCount = 0;
-
+   public dispatchMessage(message: Message, callback: (message: Message) => void): void {
       for (const webhook of this.webhooks) {
-         const maxContentLengthPerMessage = 2000;
-         const partialMessagesCount = Math.floor(message.content.length / (maxContentLengthPerMessage + 1)) + 1;
-         let sendFailed = false;
+         const payloads = this.createMessagePayloads(message);
+         const payload = payloads.shift();
 
-         const sendPartialMessageCallback = (i: number) => {
-            if (sendFailed) {
-               return;
-            }
+         webhook.send(payload!)
+            .then(() => callback(message))
+            .catch(error => console.log(error));
 
-            const start = i * maxContentLengthPerMessage;
-            const end = start + maxContentLengthPerMessage;
-
-            webhook.send({
-               content: message.content.length ? message.content.substring(start, end) : null,
-               username: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileName : message.author.username,
-               avatarURL: (this.options & MirrorOptions.UseWebhookProfile) ? webhook.profileAvatarUrl : message.author.displayAvatarURL(),
-               files: !i ? [...message.attachments.values()] : [],
-               embeds: !i ? message.embeds : undefined
-            })
-            .then(() => {
-               if (!i && ++mirroredMessagesCount == this.webhooks.length) {
-                  successCallback();
-               }
-            })
-            .catch(error => {
-               console.error(`Failed to mirror a message (partial ${i + 1}/${partialMessagesCount}): ${error}`)
-               sendFailed = true;
-            });
-         }
-
-         sendPartialMessageCallback(0);
-
-         for (let i = 1; i < partialMessagesCount; i++) {
-            setTimeout(sendPartialMessageCallback, 500, i);
+         for (const payload of payloads) {
+            setTimeout(() => {
+               webhook.send(payload).catch(error => console.log(error));
+            }, 500);
          }
       }
    }
-   
-   public messageMeetsRequirements(message: Message): boolean {
-      if (!(this.options & MirrorOptions.MirrorMessagesFromBots) && message.author.bot) {
-         return false;
-      }
 
-      if (!(this.options & MirrorOptions.MirrorReplyMessages) && message.reference) {
-         return false;
+   private createMessagePayloads(message: Message): (MessagePayload | WebhookMessageOptions)[] {
+      const maxContentLength = message.author.premiumSince ? 4000 : 2000;
+      const payloads: (MessagePayload | WebhookMessageOptions)[] = [];
+      const payload: MessagePayload | WebhookMessageOptions = {
+         files: [...message.attachments.values()],
+         embeds: message.embeds
+      };
+      if (message.content.length) {
+         payload.content = message.content.substring(0, maxContentLength);
       }
+      if (!this.mirrorOptions.useWebhookProfile) {
+         payload.username = message.author.username;
+         payload.avatarURL = message.author?.avatarURL() ?? undefined;
+      }
+      payloads.push(payload);
 
-      if (message.content.length < this.requirements.minContentLength) {
-         return false;
+      for (let i = 0; i < Math.floor(message.content.length / maxContentLength); i++) {
+         const payload: MessagePayload | WebhookMessageOptions = {
+            content: message.content.substring((i + 1) * maxContentLength, (i + 2) * maxContentLength)
+         }
+         if (!this.mirrorOptions.useWebhookProfile) {
+            payload.username = message.author.username;
+            payload.avatarURL = message.author.avatarURL() ?? undefined;
+         }
+         payloads.push(payload);
       }
-      
-      if (message.embeds.length < this.requirements.minEmbedsCount) {
-         return false;
-      }
-      
-      return message.attachments.size >= this.requirements.minAttachmentsCount;
+      return payloads;
    }
 
-   public getOptions(): MirrorOptions {
-      return this.options;
+   private messageMeetsOptions(message: Message): boolean {
+      return (
+         (this.mirrorOptions.mirrorMessagesFromBots || message.author.bot) &&
+         (this.mirrorOptions.mirrorReplyMessages || message.reference == null) &&
+         (this.mirrorOptions.mirrorMessagesOnEdit || message.editedAt == null)
+      );
+   }
+
+   private messageMeetsRequirements(message: Message): boolean {
+      return (
+         message.content.length >= this.mirrorRequirements.minContentLength &&
+         message.embeds.length >= this.mirrorRequirements.minEmbedsCount &&
+         message.attachments.size >= this.mirrorRequirements.minAttachmentsCount &&
+         !(message.author.id in this.ignoredUserIds) &&
+         (message.member == null || !memberHasRole(message.member, ...this.ignoredRoleIds))
+      );
+   }
+
+   private loadWebhooks(webhookUrls: string[]): void {
+      for (const webhookUrl of webhookUrls) {
+         this.webhooks.push(new WebhookClient({url: webhookUrl}));
+      }
    }
 }

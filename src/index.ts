@@ -1,11 +1,7 @@
 import { MirrorClient } from "./client";
-import { Intents } from "discord.js-selfbot-v13";
-import config from '../config.json';
+import { Config } from "./config";
 
-const client = new MirrorClient({
-    checkUpdate: false,
-    intents: [ Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.MESSAGE_CONTENT ]
-});
+const config = new Config("config.yml");
+const client = new MirrorClient(config);
 
-client.start();
-client.login(config.token);
+client.login(config.getToken());
