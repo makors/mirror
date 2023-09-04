@@ -44,7 +44,7 @@ class Replacement {
       switch (where) {
          case undefined:
          case ReplacementLocation.EVERYWHERE:
-            return this.replaceAnywhere;
+            return this.replaceEverywhere;
          case ReplacementLocation.MESSAGE_CONTENT:
             return this.replaceContent;
          case ReplacementLocation.EMBED_AUTHOR:
@@ -84,7 +84,7 @@ class Replacement {
       }
    }
 
-   private replaceAnywhere(message: Message): void {
+   private replaceEverywhere(message: Message): void {
       this.replaceContent(message);
       this.replaceEmbedAuthor(message);
       this.replaceEmbedAuthorUrl(message);
