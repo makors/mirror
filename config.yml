@@ -41,7 +41,7 @@ mirrors:
          mirrorReplyMessages: true
          mirrorMessagesOnEdit: false
       # Replacements to perform before mirroring a message.
-      # The where: option is used to sepcify which part of a message
+      # The where: option is used to specify which part of a message
       # should be replaced. The available options are:
       #
       # everywhere, message_content, embed_author, embed_author_url,
