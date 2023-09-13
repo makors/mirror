@@ -11,7 +11,7 @@ status: "online"
 
 # Message sent in the console when a message is mirrored.
 # You can set this to "" to disable it.
-logMessage: "(%date%) Mirrored %author% message from %server%."
+logMessage: "[%date%] Mirrored @%author%'s message from %server% #%channel%."
 
 mirrors:
    # The following contains a mirror with its options.
