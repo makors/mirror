@@ -96,7 +96,9 @@ class Replacement {
       this.replaceEmbedThumbnailUrl(message);
       this.replaceEmbedFooter(message);
       this.replaceEmbedFooterIconUrl(message);
-      this.replaceEmbedColor(message);
+      if (isValidHexColor(this.replace) && isValidHexColor(this.with)) {
+         this.replaceEmbedColor(message);
+      }
    }
 
    private replaceContent(message: Message): void {

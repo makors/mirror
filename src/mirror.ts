@@ -17,8 +17,8 @@ interface MirrorConfigOptions {
 }
 
 export interface MirrorConfig {
-   channelIds: string[];
-   webhookUrls: string[];
+   channelIds?: string[];
+   webhookUrls?: string[];
    ignoredUserIds?: string[];
    ignoredRoleIds?: string[];
    requirements?: MirrorConfigRequirements;
@@ -34,7 +34,7 @@ class MirrorRequirements {
    public constructor({
       minEmbedsCount = 0,
       minContentLength = 0,
-      minAttachmentsCount = 0,
+      minAttachmentsCount = 0
    }: MirrorConfigRequirements) {
       this.minEmbedsCount = minEmbedsCount;
       this.minContentLength = minContentLength;
@@ -73,12 +73,12 @@ export class Mirror {
    private replacements: MirrorReplacements;
 
    public constructor(mirrorConfig: MirrorConfig) {
-      this.loadWebhooks(mirrorConfig.webhookUrls)
+      this.loadWebhooks(mirrorConfig.webhookUrls ?? []);
       this.ignoredUserIds = new Set(mirrorConfig.ignoredUserIds);
       this.ignoredRoleIds = mirrorConfig.ignoredRoleIds ?? [];
-      this.mirrorRequirements = new MirrorRequirements(mirrorConfig.requirements ?? {})
-      this.mirrorOptions = new MirrorOptions(mirrorConfig.options ?? {})
-      this.replacements = new MirrorReplacements(mirrorConfig.replacements)
+      this.mirrorRequirements = new MirrorRequirements(mirrorConfig.requirements ?? {});
+      this.mirrorOptions = new MirrorOptions(mirrorConfig.options ?? {});
+      this.replacements = new MirrorReplacements(mirrorConfig.replacements);
    }
 
    public messageMeetsMirrorCriteria(message: Message): boolean {
@@ -104,28 +104,21 @@ export class Mirror {
 
    public dispatchMessage(message: Message, callback: (message: Message) => void): void {
       for (const webhook of this.webhooks) {
-         const payloads = this.createMessagePayloads(message);
-         const payload = payloads.shift();
-
-         webhook.send(payload!)
-            .then(() => callback(message))
-            .catch(error => console.log(error));
-
-         for (const payload of payloads) {
-            setTimeout(() => {
-               webhook.send(payload).catch(error => console.log(error));
-            }, 500);
+         for (const payload of this.createMessagePayloads(message)) {
+            webhook.send(payload)
+               .then(() => callback(message))
+               .catch(error => console.log(error));
          }
       }
    }
 
    private createMessagePayloads(message: Message): (MessagePayload | WebhookMessageOptions)[] {
-      const maxContentLength = message.author.premiumSince ? 4000 : 2000;
       const payloads: (MessagePayload | WebhookMessageOptions)[] = [];
       const payload: MessagePayload | WebhookMessageOptions = {
          files: [...message.attachments.values()],
          embeds: message.embeds
       };
+      const maxContentLength = 2000;
       if (message.content.length) {
          payload.content = message.content.substring(0, maxContentLength);
       }

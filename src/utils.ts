@@ -16,6 +16,10 @@ export function isVisibleOnlyByClient(message: Message): boolean {
    return message.flags.has(MessageFlags.FLAGS.EPHEMERAL);
 }
 
+export function isEmptyMessage(message: Message): boolean {
+   return message.content.length == 0 && message.embeds.length == 0 && message.attachments.size == 0;
+}
+
 export function isGif(message: Message): boolean {
    return message.embeds.length == 1 && message.embeds.at(0)?.provider != null;
 }

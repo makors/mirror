@@ -1,7 +1,7 @@
-import { Client, Message, PartialMessage, PresenceStatusData } from "discord.js-selfbot-v13"
-import { isDirectMessage, isSystemMessage, isVisibleOnlyByClient } from "./utils";
-import { Config } from "./config"
+import { Client, Message, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
+import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient } from "./utils";
 import { Mirror, MirrorConfig } from "./mirror";
+import { Config } from "./config"
 
 type ChannelId = string;
 
@@ -49,11 +49,11 @@ export class MirrorClient extends Client {
          return;
       }
       mirror.applyReplacements(message);
-      mirror.dispatchMessage(message, message => this.logMirroredMessage(message));  
+      mirror.dispatchMessage(message, () => this.logMirroredMessage(message));  
    }
 
    private isMirrorableMessage(message: Message): boolean {
-      return !isSystemMessage(message) && !isDirectMessage(message) && !isVisibleOnlyByClient(message);
+      return !isSystemMessage(message) && !isDirectMessage(message) && !isVisibleOnlyByClient(message) && !isEmptyMessage(message);
    }
 
    private logMirroredMessage(message: Message): void {
@@ -62,9 +62,10 @@ export class MirrorClient extends Client {
          return;
       }
       console.log(logMessage
-         .replace("%date%", new Date().toUTCString())
-         .replace("%author%", message.author.username)
+         .replace("%date%", new Date().toLocaleString())
+         .replace("%author%", message.author.username ?? `<@${message.author.id}>`)
          .replace("%server%", message.guild!.name)
+         .replace("%channel%", (message.channel as TextChannel).name)
       );
    }
 
