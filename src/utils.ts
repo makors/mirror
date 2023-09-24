@@ -35,5 +35,5 @@ export function isValidHexColor(color: string): boolean {
 export function hexColorsAreEqual(hexColorA: string, hexColorB: string, epsilon: number = 3000) {
    const colorA = parseInt(hexColorA.slice(1));
    const colorB = parseInt(hexColorB.slice(1));
-   return Math.abs(colorA) - Math.abs(colorB) <= epsilon;
+   return Math.abs(colorA - colorB) <= epsilon;
 }

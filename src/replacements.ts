@@ -86,6 +86,7 @@ class Replacement {
 
    private replaceEverywhere(message: Message): void {
       this.replaceContent(message);
+      this.replaceEmbedTitle(message);
       this.replaceEmbedAuthor(message);
       this.replaceEmbedAuthorUrl(message);
       this.replaceEmbedAuthorIconUrl(message);
