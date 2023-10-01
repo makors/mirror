@@ -1,11 +1,5 @@
 import { HexColorString, Message } from "discord.js-selfbot-v13";
-import { hexColorsAreEqual, isValidHexColor } from "./utils";
-
-export interface ReplacementConfig {
-   replace: string;
-   with: string;
-   where?: ReplacementLocation;
-};
+import { hexColorsAreEqual, isString, isValidHexColor } from "./utils";
 
 enum ReplacementLocation {
    EVERYWHERE = "everywhere",
@@ -25,15 +19,27 @@ enum ReplacementLocation {
    EMBED_COLOR = "embed_color"
 }
 
+export interface ReplacementConfig {
+   replace: string;
+   with: string;
+   where?: ReplacementLocation;
+}
+
 class Replacement {
-   private replace: string;
+   private replace: string | RegExp;
    private with: string;
    private applyCallback: (message: Message) => void;
 
-   public constructor(replacementConfig: ReplacementConfig) {
-      this.replace = replacementConfig.replace;
-      this.with = replacementConfig.with;
-      this.applyCallback = this.createApplyCallback(replacementConfig.where);
+   public constructor(config: ReplacementConfig) {
+      if (config.replace == "*") {
+         const replaceAllRegex = /^(.|\n)*/g;
+         this.replace = replaceAllRegex;
+      }
+      else {
+         this.replace = config.replace;
+      }
+      this.with = config.with;
+      this.applyCallback = this.createApplyCallback(config.where);
    }
 
    public apply(message: Message): void {
@@ -72,11 +78,11 @@ class Replacement {
          case ReplacementLocation.EMBED_FOOTER_ICON_URL:
             return this.replaceEmbedFooterIconUrl;
          case ReplacementLocation.EMBED_COLOR:
-            if (!isValidHexColor(this.replace)) {
-               throw new Error(`Invalid color in config.yml (only hex is supported): replace: "${this.replace}".`);
+            if (isString(this.replace) && !isValidHexColor(this.replace as string)) {
+               throw new Error(`Invalid color in config.yml (only hex is supported): replace: "${this.replace}"`);
             }
             if (!isValidHexColor(this.with)) {
-               throw new Error(`Invalid color in config.yml (only hex is supported): with: "${this.with}".`);
+               throw new Error(`Invalid color in config.yml (only hex is supported): with: "${this.with}"`);
             }
             return this.replaceEmbedColor;
          default:
@@ -97,7 +103,9 @@ class Replacement {
       this.replaceEmbedThumbnailUrl(message);
       this.replaceEmbedFooter(message);
       this.replaceEmbedFooterIconUrl(message);
-      if (isValidHexColor(this.replace) && isValidHexColor(this.with)) {
+      this.replaceEmbedUrl(message);
+      
+      if (isString(this.replace) && isValidHexColor(this.replace as string) && isValidHexColor(this.with)) {
          this.replaceEmbedColor(message);
       }
    }
@@ -106,58 +114,52 @@ class Replacement {
       message.content = message.content.replace(this.replace, this.with);
    }
 
-   private replaceEmbedAuthor(message: Message): void {
+   private replaceEmbedProperty(message: Message, ...keys: string[]): void {
       for (const embed of message.embeds) {
-         if (embed.author) {
-            embed.author.name = embed.author.name.replace(this.replace, this.with);
+         let object: any = embed;
+
+         for (const key of keys.slice(0, -1)) {
+            if (!(object = object[key])) {
+               return;
+            }
+         }
+         const lastProperty = keys[keys.length - 1];
+         const propertyValue = object[lastProperty];
+
+         if (propertyValue) {
+            object[lastProperty] = propertyValue.replace(this.replace, this.with);
          }
       }
+   }
+
+   private replaceEmbedAuthor(message: Message): void {
+      this.replaceEmbedProperty(message, "author", "name");
    }
 
    private replaceEmbedAuthorUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.author?.url) {
-            embed.author.url = embed.author.url.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "author", "url");
    }
 
    private replaceEmbedAuthorIconUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.author?.iconURL) {
-            embed.author.iconURL = embed.author.iconURL.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "author", "iconURL");
    }
 
    private replaceEmbedTitle(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.title) {
-            embed.title = embed.title.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "title");
    }
 
    private replaceEmbedDescription(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.description) {
-            embed.description = embed.description.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "description");
    }
 
    private replaceEmbedUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.url) {
-            embed.url = embed.url.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "url");
    }
 
    private replaceEmbedColor(message: Message): void {
       for (const embed of message.embeds) {
          const embedColor = embed.hexColor ?? "#000000";
-         if (hexColorsAreEqual(embedColor, this.replace)) {
+         if (hexColorsAreEqual(embedColor, this.replace as string)) {
             embed.setColor(this.with as HexColorString);
          }
       }
@@ -180,35 +182,19 @@ class Replacement {
    }
 
    private replaceEmbedImageUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.image?.url) {
-            embed.image.url = embed.image.url.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "image", "url");
    }
 
    private replaceEmbedThumbnailUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.thumbnail?.url) {
-            embed.thumbnail.url = embed.thumbnail.url.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "thumbnail", "url");
    }
 
    private replaceEmbedFooter(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.footer?.text) {
-            embed.footer.text = embed.footer.text.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "footer", "text");
    }
 
    private replaceEmbedFooterIconUrl(message: Message): void {
-      for (const embed of message.embeds) {
-         if (embed.footer?.iconURL) {
-            embed.footer.iconURL = embed.footer.iconURL.replace(this.replace, this.with);
-         }
-      }
+      this.replaceEmbedProperty(message, "footer", "iconURL");
    }
 }
 

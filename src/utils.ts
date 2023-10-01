@@ -28,6 +28,10 @@ export function containsOnlyAttachments(message: Message): boolean {
    return message.attachments.size > 0 && !message.content.length && !message.embeds.length;
 }
 
+export function isString(value: any): boolean {
+   return typeof value === "string";
+}
+
 export function isValidHexColor(color: string): boolean {
    return /^#[0-9A-F]{6}$/i.test(color);
 }

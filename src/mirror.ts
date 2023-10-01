@@ -3,9 +3,9 @@ import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
 
 interface MirrorConfigRequirements {
-   minEmbedsCount?: number;   
-   minContentLength?: number;   
-   minAttachmentsCount?: number;   
+   minEmbedsCount?: number;
+   minContentLength?: number;
+   minAttachmentsCount?: number;
 }
 
 interface MirrorConfigOptions {
@@ -63,7 +63,7 @@ class MirrorOptions {
       this.mirrorMessagesOnEdit = mirrorMessagesOnEdit;
    }
 }
- 
+
 export class Mirror {
    private webhooks: WebhookClient[] = [];
    private ignoredUserIds: Set<string>;
@@ -72,17 +72,27 @@ export class Mirror {
    private mirrorOptions: MirrorOptions;
    private replacements: MirrorReplacements;
 
-   public constructor(mirrorConfig: MirrorConfig) {
-      this.loadWebhooks(mirrorConfig.webhookUrls ?? []);
-      this.ignoredUserIds = new Set(mirrorConfig.ignoredUserIds);
-      this.ignoredRoleIds = mirrorConfig.ignoredRoleIds ?? [];
-      this.mirrorRequirements = new MirrorRequirements(mirrorConfig.requirements ?? {});
-      this.mirrorOptions = new MirrorOptions(mirrorConfig.options ?? {});
-      this.replacements = new MirrorReplacements(mirrorConfig.replacements);
+   public constructor({
+      webhookUrls = [],
+      ignoredUserIds = undefined,
+      ignoredRoleIds = [],
+      requirements = {},
+      options = {},
+      replacements = {}
+   }: MirrorConfig) {
+      this.loadWebhooks(webhookUrls);
+      this.ignoredUserIds = new Set(ignoredUserIds);
+      this.ignoredRoleIds = ignoredRoleIds;
+      this.mirrorRequirements = new MirrorRequirements(requirements);
+      this.mirrorOptions = new MirrorOptions(options);
+      this.replacements = new MirrorReplacements(replacements);
    }
 
    public messageMeetsMirrorCriteria(message: Message): boolean {
-      return this.messageMeetsOptions(message) && this.messageMeetsRequirements(message);
+      return (
+         this.messageMeetsOptions(message) && 
+         this.messageMeetsRequirements(message)
+      );
    }
 
    public stripMessage(message: Message): boolean {
@@ -105,7 +115,8 @@ export class Mirror {
    public dispatchMessage(message: Message, callback: (message: Message) => void): void {
       for (const webhook of this.webhooks) {
          for (const payload of this.createMessagePayloads(message)) {
-            webhook.send(payload)
+            webhook
+               .send(payload)
                .then(() => callback(message))
                .catch(error => console.log(error));
          }
@@ -118,6 +129,7 @@ export class Mirror {
          files: [...message.attachments.values()],
          embeds: message.embeds
       };
+      
       const maxContentLength = 2000;
       if (message.content.length) {
          payload.content = message.content.substring(0, maxContentLength);
@@ -161,7 +173,7 @@ export class Mirror {
 
    private loadWebhooks(webhookUrls: string[]): void {
       for (const webhookUrl of webhookUrls) {
-         this.webhooks.push(new WebhookClient({url: webhookUrl}));
+         this.webhooks.push(new WebhookClient({ url: webhookUrl }));
       }
    }
 }

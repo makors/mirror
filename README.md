@@ -39,7 +39,7 @@ status: "online"
 
 # Message sent in the console when a message is mirrored.
 # You can set this to "" to disable it.
-logMessage: "(%date%) Mirrored %author% message from %server%."
+logMessage: "[%date%] Mirrored @%author%'s message from %server% #%channel%."
 
 mirrors:
    # The following contains a mirror with its options.
@@ -86,6 +86,12 @@ mirrors:
          # 2:
          #    replace: "insert_role_id_to_replace_here"
          #    with: "insert_replaced_role_id_here"
+         #    where: "everywhere"
+         #
+         # To replace everything with a specific text, you can use the wildcard (*):
+         # 3:
+         #    replace: "*"
+         #    with: "this_text_will_replace_everything"
          #    where: "everywhere"
    # You can create as many mirrors as you want, so that different
    # channels can be mirrored to different webhooks. For example:
