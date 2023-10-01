@@ -105,7 +105,8 @@ class Replacement {
       this.replaceEmbedFooterIconUrl(message);
       this.replaceEmbedUrl(message);
       
-      if (isString(this.replace) && isValidHexColor(this.replace as string) && isValidHexColor(this.with)) {
+      if (!isString(this.replace) || 
+         (isValidHexColor(this.replace as string) && isValidHexColor(this.with))) {
          this.replaceEmbedColor(message);
       }
    }
@@ -159,7 +160,11 @@ class Replacement {
    private replaceEmbedColor(message: Message): void {
       for (const embed of message.embeds) {
          const embedColor = embed.hexColor ?? "#000000";
-         if (hexColorsAreEqual(embedColor, this.replace as string)) {
+
+         if (!isString(this.replace)) {
+            embed.setColor(this.with as HexColorString);
+         }
+         else if (hexColorsAreEqual(embedColor, this.replace as string)) {
             embed.setColor(this.with as HexColorString);
          }
       }
