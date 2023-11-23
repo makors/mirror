@@ -4,6 +4,10 @@ export function memberHasRole(member: GuildMember, ...roleId: string[]): boolean
    return member.roles.cache.hasAny(...roleId);
 }
 
+export function isPublishedMessage(message: Message): boolean {
+   return message.flags.has(MessageFlags.FLAGS.CROSSPOSTED);
+}
+
 export function isSystemMessage(message: Message): boolean {
    return message.system;
 }

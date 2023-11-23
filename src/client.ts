@@ -1,5 +1,5 @@
-import { Client, Message, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
-import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient } from "./utils";
+import { Client, Message, MessageFlags, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
+import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient, isPublishedMessage } from "./utils";
 import { Mirror, MirrorConfig } from "./mirror";
 import { Config } from "./config"
 
@@ -53,7 +53,11 @@ export class MirrorClient extends Client {
    }
 
    private isMirrorableMessage(message: Message): boolean {
-      return !isSystemMessage(message) && !isDirectMessage(message) && !isVisibleOnlyByClient(message) && !isEmptyMessage(message);
+      return (
+         !isSystemMessage(message) && !isDirectMessage(message) &&
+         !isVisibleOnlyByClient(message) && !isEmptyMessage(message) &&
+         !isPublishedMessage(message)
+      );
    }
 
    private logMirroredMessage(message: Message): void {
