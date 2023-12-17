@@ -23,6 +23,20 @@ Mirrored message (to server B):\
 5. Configure `config.yml`.
 5. Run `npm start` to start the bot.
 
+# Docker
+1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed on your machine.
+2. Build the Docker image by running the following command in your project directory:
+   ```sh
+   docker build -t discord-mirror-bot .
+   ```
+3. Run the Docker image
+   ```sh
+   docker run -d discord-mirror-bot
+   ```
+   This will create a Docker container with your bot running inside it
+
+Please note that you need to ensure your `config.yml` file is correctly set up before building the Docker image. The Dockerfile copies `config.yml` from your project directory into the Docker image at build time. 
+
 # Configuration guide
 Each option in `config.yml` is either self explanatory or has a comment above describing it:
 ```yml
