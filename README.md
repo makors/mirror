@@ -18,24 +18,11 @@ Mirrored message (to server B):\
 # How To Use
 1. Install [NodeJS](https://nodejs.org/en/download).
 2. Clone this repository.
-3. Navigate to the project folder and run `npm install` to install the dependencies.
-4. Run `npm run compile` to compile the bot.
-5. Configure `config.yml`.
-5. Run `npm start` to start the bot.
-
-# Docker
-1. Make sure you have [Docker](https://docs.docker.com/get-docker/) installed on your machine.
-2. Build the Docker image by running the following command in your project directory:
-   ```sh
-   docker build -t discord-mirror-bot .
-   ```
-3. Run the Docker image
-   ```sh
-   docker run -d discord-mirror-bot
-   ```
-   This will create a Docker container with your bot running inside it
-
-Please note that you need to ensure your `config.yml` file is correctly set up before building the Docker image. The Dockerfile copies `config.yml` from your project directory into the Docker image at build time. 
+3. Enter to the repository folder.
+4. Run `npm install` to install the dependencies.
+5. Run `npm run compile` to compile the bot.
+6. Configure `config.yml`.
+7. Run `npm start` to start the bot.
 
 # Configuration guide
 Each option in `config.yml` is either self explanatory or has a comment above describing it:
@@ -115,6 +102,16 @@ mirrors:
    #   webhookUrls:
    #     - "insert_destionation_webhook_url_here"
 ```
+
+# Docker Setup
+If you wish to setup and use the bot via Docker, follow this steps:
+
+1. Install [Docker](https://docs.docker.com/get-docker/).
+2. Clone this repository.
+3. Enter the repository folder.
+4. Configure `config.yml` (must be done before step 5).
+5. Run `docker build -t discord-mirror-bot .` to build the Docker image.
+6. Run `docker run -d discord-mirror-bot` to run the Docker image (this starts a container with your bot running inside it).
 
 # Disclaimer
 
