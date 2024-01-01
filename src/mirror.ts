@@ -88,24 +88,12 @@ export class Mirror {
       this.replacements = new MirrorReplacements(replacements);
    }
 
-   public messageMeetsMirrorCriteria(message: Message): boolean {
+   public shouldMirror(message: Message, isUpdate: boolean): boolean {
       return (
-         this.messageMeetsOptions(message) && 
-         this.messageMeetsRequirements(message)
+         this.messageMeetsOptions(message, isUpdate) &&
+         this.messageMeetsRequirements(message) && 
+         this.stripMessage(message)
       );
-   }
-
-   public stripMessage(message: Message): boolean {
-      if (this.mirrorOptions.removeAttachments) {
-         if (containsOnlyAttachments(message)) {
-            return false;
-         }
-         message.attachments.clear();
-      }
-      if (isGif(message)) {
-         message.embeds.pop();
-      }
-      return true;
    }
 
    public applyReplacements(message: Message): void {
@@ -153,11 +141,11 @@ export class Mirror {
       return payloads;
    }
 
-   private messageMeetsOptions(message: Message): boolean {
+   private messageMeetsOptions(message: Message, isUpdate: boolean): boolean {
       return (
          (this.mirrorOptions.mirrorMessagesFromBots || message.author.bot) &&
          (this.mirrorOptions.mirrorReplyMessages || message.reference == null) &&
-         (this.mirrorOptions.mirrorMessagesOnEdit || message.editedAt == null)
+         (this.mirrorOptions.mirrorMessagesOnEdit || !isUpdate)
       );
    }
 
@@ -169,6 +157,19 @@ export class Mirror {
          !(message.author.id in this.ignoredUserIds) &&
          (message.member == null || !memberHasRole(message.member, ...this.ignoredRoleIds))
       );
+   }
+
+   private stripMessage(message: Message): boolean {
+      if (this.mirrorOptions.removeAttachments) {
+         if (containsOnlyAttachments(message)) {
+            return false;
+         }
+         message.attachments.clear();
+      }
+      if (isGif(message)) {
+         message.embeds.pop();
+      }
+      return true;
    }
 
    private loadWebhooks(webhookUrls: string[]): void {

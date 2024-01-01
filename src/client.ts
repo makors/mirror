@@ -1,4 +1,4 @@
-import { Client, Message, MessageFlags, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
+import { Client, Message, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
 import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient, isPublishedMessage } from "./utils";
 import { Mirror, MirrorConfig } from "./mirror";
 import { Config } from "./config"
@@ -30,11 +30,11 @@ export class MirrorClient extends Client {
 
    private onMessageUpdate(_oldMessage: Message | PartialMessage, newMessage: Message | PartialMessage): void {
       if (!newMessage.partial) {
-         this.mirrorMessage(newMessage);
+         this.mirrorMessage(newMessage, true);
       }
    }
 
-   private mirrorMessage(message: Message) {
+   private mirrorMessage(message: Message, isUpdate: boolean = false): void {
       if (!this.isMirrorableMessage(message)) {
          return;
       }
@@ -42,10 +42,7 @@ export class MirrorClient extends Client {
       if (!mirror) {
          return;
       }
-      if (!mirror.messageMeetsMirrorCriteria(message)) {
-         return;
-      }
-      if (!mirror.stripMessage(message)) {
+      if (!mirror.shouldMirror(message, isUpdate)) {
          return;
       }
       mirror.applyReplacements(message);
@@ -67,7 +64,7 @@ export class MirrorClient extends Client {
       }
       console.log(logMessage
          .replace("%date%", new Date().toLocaleString())
-         .replace("%author%", message.author.username ?? `<@${message.author.id}>`)
+         .replace("%author%", message?.author?.username ?? "unknown")
          .replace("%server%", message.guild!.name)
          .replace("%channel%", (message.channel as TextChannel).name)
       );
