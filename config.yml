@@ -15,7 +15,7 @@ logMessage: "[%date%] Mirrored @%author%'s message from %server% #%channel%."
 
 mirrors:
    # The following contains a mirror with its options.
-   # Every option is optional and can be removed if not required.
+   # Every option is optional and can be removed from this file if not required.
    1:
       # You can find the id of a channel by enabling the Developer mode in your
       # Discord account settings and Right-Click -> Copy ID on a channel.
@@ -30,15 +30,21 @@ mirrors:
          - "insert_user_id_not_to_mirror_here"
       ignoredRoleIds:
          - "insert_role_id_not_to_mirror_here"
+      # Requirements that a message must meet to be mirrored.
       requirements:
          minEmbedsCount: 0
          minContentLength: 0
          minAttachmentsCount: 0
       options:
+         # Whether to use the webhook's profile picture and name to mirror messages.
          useWebhookProfile: false
+         # Whether to remove attachments before mirroring a message.
          removeAttachments: false
+         # Whether to mirror messages coming from bots.
          mirrorMessagesFromBots: true
+         # Whether to mirror messages that are replies to other messages.
          mirrorReplyMessages: true
+         # Whether to mirror messages when they are edited.
          mirrorMessagesOnEdit: false
       # Replacements to perform before mirroring a message.
       # The where: option is used to specify which part of a message

@@ -45,7 +45,11 @@ export class MirrorClient extends Client {
       if (!mirror.shouldMirror(message, isUpdate)) {
          return;
       }
-      mirror.applyReplacements(message);
+      try {
+         mirror.applyReplacements(message);
+      } catch (error) {
+         console.log(error);
+      }
       mirror.dispatchMessage(message, () => this.logMirroredMessage(message));  
    }
 

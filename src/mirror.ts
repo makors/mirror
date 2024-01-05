@@ -101,8 +101,10 @@ export class Mirror {
    }
 
    public dispatchMessage(message: Message, callback: (message: Message) => void): void {
+      const payloads = this.createMessagePayloads(message);
+      
       for (const webhook of this.webhooks) {
-         for (const payload of this.createMessagePayloads(message)) {
+         for (const payload of payloads) {
             webhook
                .send(payload)
                .then(() => callback(message))
