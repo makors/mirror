@@ -114,23 +114,21 @@ export class Mirror {
    }
 
    private createMessagePayloads(message: Message): (MessagePayload | WebhookMessageOptions)[] {
+      const maxContentLength = 2000;
+
       const payloads: (MessagePayload | WebhookMessageOptions)[] = [];
       const payload: MessagePayload | WebhookMessageOptions = {
+         content: message.content.length ? message.content.substring(0, maxContentLength) : undefined,
          files: [...message.attachments.values()],
          embeds: message.embeds
       };
-      
-      const maxContentLength = 2000;
-      if (message.content.length) {
-         payload.content = message.content.substring(0, maxContentLength);
-      }
       if (!this.mirrorOptions.useWebhookProfile) {
          payload.username = message.author.username;
          payload.avatarURL = message.author?.avatarURL() ?? undefined;
       }
       payloads.push(payload);
 
-      for (let i = 0; i < Math.floor(message.content.length / maxContentLength); i++) {
+      for (let i = 0; i < Math.floor(message.content.length / (maxContentLength + 1)); i++) {
          const payload: MessagePayload | WebhookMessageOptions = {
             content: message.content.substring((i + 1) * maxContentLength, (i + 2) * maxContentLength)
          }
@@ -145,8 +143,8 @@ export class Mirror {
 
    private messageMeetsOptions(message: Message, isUpdate: boolean): boolean {
       return (
-         (this.mirrorOptions.mirrorMessagesFromBots || message.author.bot) &&
-         (this.mirrorOptions.mirrorReplyMessages || message.reference == null) &&
+         (this.mirrorOptions.mirrorMessagesFromBots || !message.author.bot) &&
+         (this.mirrorOptions.mirrorReplyMessages || !message.reference) &&
          (this.mirrorOptions.mirrorMessagesOnEdit || !isUpdate)
       );
    }
