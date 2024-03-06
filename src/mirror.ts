@@ -1,4 +1,4 @@
-import { Message, MessagePayload, WebhookClient, WebhookMessageOptions } from "discord.js-selfbot-v13";
+import { Message, MessageEmbed, MessagePayload, WebhookClient, WebhookMessageOptions } from "discord.js-selfbot-v13";
 import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
 
@@ -120,7 +120,7 @@ export class Mirror {
       const payload: MessagePayload | WebhookMessageOptions = {
          content: message.content.length ? message.content.substring(0, maxContentLength) : undefined,
          files: [...message.attachments.values()],
-         embeds: message.embeds
+         embeds: this.fixInvalidEmbeds(message)
       };
       if (!this.mirrorOptions.useWebhookProfile) {
          payload.username = message.author.username;
@@ -139,6 +139,17 @@ export class Mirror {
          payloads.push(payload);
       }
       return payloads;
+   }
+
+   private fixInvalidEmbeds(message: Message): MessageEmbed[] {
+      for (const embed of message.embeds) {
+         for (const field of embed.fields) {
+            if (!field.value.length) {
+               field.value = "\u200B";
+            }
+         }
+      }
+      return message.embeds;
    }
 
    private messageMeetsOptions(message: Message, isUpdate: boolean): boolean {
