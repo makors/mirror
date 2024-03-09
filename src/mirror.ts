@@ -1,29 +1,12 @@
 import { Message, MessageEmbed, MessagePayload, WebhookClient, WebhookMessageOptions } from "discord.js-selfbot-v13";
 import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
+import { Filter, FilterConfig } from "./filter";
 
 interface MirrorConfigRequirements {
    minEmbedsCount?: number;
    minContentLength?: number;
    minAttachmentsCount?: number;
-}
-
-interface MirrorConfigOptions {
-   useWebhookProfile?: boolean;
-   removeAttachments?: boolean;
-   mirrorMessagesFromBots?: boolean;
-   mirrorReplyMessages?: boolean;
-   mirrorMessagesOnEdit?: boolean;
-}
-
-export interface MirrorConfig {
-   channelIds?: string[];
-   webhookUrls?: string[];
-   ignoredUserIds?: string[];
-   ignoredRoleIds?: string[];
-   requirements?: MirrorConfigRequirements;
-   options?: MirrorConfigOptions;
-   replacements?: Record<number, ReplacementConfig>;
 }
 
 class MirrorRequirements {
@@ -40,6 +23,14 @@ class MirrorRequirements {
       this.minContentLength = minContentLength;
       this.minAttachmentsCount = minAttachmentsCount;
    }
+}
+
+interface MirrorConfigOptions {
+   useWebhookProfile?: boolean;
+   removeAttachments?: boolean;
+   mirrorMessagesFromBots?: boolean;
+   mirrorReplyMessages?: boolean;
+   mirrorMessagesOnEdit?: boolean;
 }
 
 class MirrorOptions {
@@ -64,6 +55,17 @@ class MirrorOptions {
    }
 }
 
+export interface MirrorConfig {
+   channelIds?: string[];
+   webhookUrls?: string[];
+   ignoredUserIds?: string[];
+   ignoredRoleIds?: string[];
+   requirements?: MirrorConfigRequirements;
+   options?: MirrorConfigOptions;
+   replacements?: Record<number, ReplacementConfig>;
+   filter?: FilterConfig;
+}
+
 export class Mirror {
    private webhooks: WebhookClient[] = [];
    private ignoredUserIds: Set<string>;
@@ -71,14 +73,16 @@ export class Mirror {
    private mirrorRequirements: MirrorRequirements;
    private mirrorOptions: MirrorOptions;
    private replacements: MirrorReplacements;
+   private filter: Filter | undefined;
 
    public constructor({
       webhookUrls = [],
-      ignoredUserIds = undefined,
+      ignoredUserIds,
       ignoredRoleIds = [],
       requirements = {},
       options = {},
-      replacements = {}
+      replacements = {},
+      filter
    }: MirrorConfig) {
       this.loadWebhooks(webhookUrls);
       this.ignoredUserIds = new Set(ignoredUserIds);
@@ -86,12 +90,14 @@ export class Mirror {
       this.mirrorRequirements = new MirrorRequirements(requirements);
       this.mirrorOptions = new MirrorOptions(options);
       this.replacements = new MirrorReplacements(replacements);
+      this.filter = filter ? new Filter(filter) : undefined;
    }
 
    public shouldMirror(message: Message, isUpdate: boolean): boolean {
       return (
          this.messageMeetsOptions(message, isUpdate) &&
-         this.messageMeetsRequirements(message) && 
+         this.messageMeetsRequirements(message) &&
+         this.doesMatchFilter(message) &&
          this.stripMessage(message)
       );
    }
@@ -108,7 +114,7 @@ export class Mirror {
             webhook
                .send(payload)
                .then(() => callback(message))
-               .catch(error => console.log(error));
+               .catch(error => console.error(error));
          }
       }
    }
@@ -128,7 +134,8 @@ export class Mirror {
       }
       payloads.push(payload);
 
-      for (let i = 0; i < Math.floor(message.content.length / (maxContentLength + 1)); i++) {
+      const chunks = Math.floor(message.content.length / (maxContentLength + 1));
+      for (let i = 0; i < chunks; i++) {
          const payload: MessagePayload | WebhookMessageOptions = {
             content: message.content.substring((i + 1) * maxContentLength, (i + 2) * maxContentLength)
          }
@@ -168,6 +175,10 @@ export class Mirror {
          !(message.author.id in this.ignoredUserIds) &&
          (message.member == null || !memberHasRole(message.member, ...this.ignoredRoleIds))
       );
+   }
+
+   private doesMatchFilter(message: Message): boolean {
+      return this.filter != undefined && this.filter.doesMatchFilter(message);
    }
 
    private stripMessage(message: Message): boolean {

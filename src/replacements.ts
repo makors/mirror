@@ -71,7 +71,7 @@ class Replacement {
             return this.replaceEmbedFooter;
          case ReplacementLocation.EMBED_FOOTER_ICON_URL:
             return this.replaceEmbedFooterIconUrl;
-         case ReplacementLocation.EMBED_COLOR:
+         case ReplacementLocation.EMBED_COLOR: {
             if (!isValidHexColor(this.replace.source)) {
                throw new Error(`Invalid color in your config.yml (only hex is supported). Replace "${this.replace.source}" with a valid hex color (e.g. #3463D9) to fix this error.`);
             }
@@ -79,8 +79,9 @@ class Replacement {
                throw new Error(`Invalid color in your config.yml (only hex is supported). Replace "${this.with}" with a valid hex color (e.g. #3463D9) to fix this error.`);
             }
             return this.replaceEmbedColor;
+         }
          default:
-            throw new Error(`Invalid option in config.yml: where: "${where}"`);
+            throw new Error(`Invalid replacement location: ${where}`);
       }
    }
 
@@ -203,10 +204,7 @@ class Replacement {
 export class MirrorReplacements {
    private replacements: Replacement[] = [];
 
-   public constructor(replacementsConfig: Record<number, ReplacementConfig> | undefined) {
-      if (!replacementsConfig) {
-         return;
-      }
+   public constructor(replacementsConfig: Record<number, ReplacementConfig>) {
       this.replacements = Object.values(replacementsConfig).map((config) => new Replacement(config));
    }
 

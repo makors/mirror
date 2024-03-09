@@ -1,4 +1,8 @@
-import { GuildMember, Message, MessageFlags } from "discord.js-selfbot-v13";
+import { ForumChannel, GuildMember, Message, MessageFlags, NewsChannel, TextChannel, ThreadChannel } from "discord.js-selfbot-v13";
+
+export function getParentChannel(message: Message): NewsChannel | TextChannel | ForumChannel | null {
+   return (message.channel instanceof ThreadChannel) ? (message.channel as ThreadChannel).parent ?? null : null;
+}
 
 export function memberHasRole(member: GuildMember, ...roleId: string[]): boolean {
    return member.roles.cache.hasAny(...roleId);
@@ -21,7 +25,7 @@ export function isVisibleOnlyByClient(message: Message): boolean {
 }
 
 export function isEmptyMessage(message: Message): boolean {
-   return message.content.length == 0 && message.embeds.length == 0 && message.attachments.size == 0;
+   return !message.content.length && !message.embeds.length && !message.attachments.size;
 }
 
 export function isGif(message: Message): boolean {

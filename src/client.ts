@@ -1,5 +1,5 @@
 import { Client, Message, PartialMessage, PresenceStatusData, TextChannel } from "discord.js-selfbot-v13"
-import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient, isPublishedMessage } from "./utils";
+import { isDirectMessage, isEmptyMessage, isSystemMessage, isVisibleOnlyByClient, isPublishedMessage, getParentChannel } from "./utils";
 import { Mirror, MirrorConfig } from "./mirror";
 import { Config } from "./config"
 
@@ -7,7 +7,7 @@ type ChannelId = string;
 
 export class MirrorClient extends Client {
    private config: Config;
-   private mirrorChannels: Map<ChannelId, Mirror> = new Map();
+   private mirrors: Map<ChannelId, Mirror> = new Map();
 
    public constructor(config: Config) {
       super({checkUpdate: false});
@@ -38,7 +38,7 @@ export class MirrorClient extends Client {
       if (!this.isMirrorableMessage(message)) {
          return;
       }
-      const mirror = this.mirrorChannels.get(message.channelId);
+      let mirror = this.getMirrorFromMessage(message);
       if (!mirror) {
          return;
       }
@@ -48,9 +48,21 @@ export class MirrorClient extends Client {
       try {
          mirror.applyReplacements(message);
       } catch (error) {
-         console.log(error);
+         console.error(error);
       }
       mirror.dispatchMessage(message, () => this.logMirroredMessage(message));  
+   }
+
+   private getMirrorFromMessage(message: Message): Mirror | undefined {
+      let mirror = this.mirrors.get(message.channelId);
+      if (mirror) {
+         return mirror;
+      }
+      const parent = getParentChannel(message);
+      if (parent) {
+         return this.mirrors.get(parent.id);
+      }
+      return undefined;
    }
 
    private isMirrorableMessage(message: Message): boolean {
@@ -87,7 +99,7 @@ export class MirrorClient extends Client {
       }
       const mirror = new Mirror(mirrorConfig);
       for (const channelId of channelIds) {
-         this.mirrorChannels.set(channelId, mirror);
+         this.mirrors.set(channelId, mirror);
       }
    }
 }
