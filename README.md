@@ -48,11 +48,12 @@ mirrors:
    1:
       # You can find the id of a channel by enabling the Developer mode in your
       # Discord account settings and Right-Click -> Copy ID on a channel.
+      #
+      # If you want to mirror thread channels, you can use the id of the parent channel.
       channelIds:
          - "insert_channel_id_to_mirror_here"
       # Webhooks are used to send mirrored messages to specific channels.
-      # You can create a webhook for a channel with:
-      # Edit channel -> Integrations -> Webhooks -> New webook.
+      # You can create a webhook for a channel with: Edit channel -> Integrations -> Webhooks -> New webook.
       webhookUrls:
          - "insert_destionation_webhook_url_here"
       ignoredUserIds:
@@ -88,8 +89,7 @@ mirrors:
             replace: "insert_text_to_replace_here"
             with: "insert_replaced_text_here"
             where: "everywhere"
-         # To replace mentions of @roles, @users or #channels,
-         # you have to replace their ids. For example:
+         # To replace mentions of @roles, @users or #channels, you have to replace their ids:
          # 2:
          #    replace: "insert_role_id_to_replace_here"
          #    with: "insert_replaced_role_id_here"
@@ -100,6 +100,17 @@ mirrors:
          #    replace: "*"
          #    with: "this_text_will_replace_everything"
          #    where: "everywhere"
+      # Filter allows you to only mirror messages that contain or do not contain specific keywords.
+      filter:
+         # "whitelist": only mirror messages that contain at least one of the keywords.
+         # "blacklist": only mirror messages that do not contain any of the keywords.
+         # "none": do not filter messages.
+         type: "none"
+         keywords:
+            - "insert_keyword_here"
+         # The where option is used to specify where the filter should be applied.
+         # The available options are: message, post_tag.
+         where: "message"
    # You can create as many mirrors as you want, so that different
    # channels can be mirrored to different webhooks. For example:
    # 2:
