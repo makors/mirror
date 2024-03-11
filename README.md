@@ -12,8 +12,9 @@ Mirrored message (to server B):\
 
 - Replace mentions and other content before mirroring a message.
 - Disguise mirrored messages as the original author or use a custom webhook profile.
-- Support mirroring as many channels as you want to as many webhooks as you want.
+- Allow mirroring only messages containing specific keywords.
 - Prevent specific users and roles from being mirrored.
+- Support mirroring as many channels as you want to as many webhooks as you want.
 
 # How To Use
 1. Install [NodeJS](https://nodejs.org/en/download).
