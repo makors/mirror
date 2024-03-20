@@ -35,15 +35,15 @@ export class Filter {
       }
 
       return this.location == FilterLocation.MESSAGE
-         ? this.doesContentMatchFilter(message)
+         ? this.doesMessageMatchFilter(message)
          : this.doesTagMatchFilter(message);
    }
 
-   private doesContentMatchFilter(message: Message): boolean {
-      return this.passesContentFilter(message) && this.passesEmbedsFilter(message);
+   private doesMessageMatchFilter(message: Message): boolean {
+      return this.doesContentMatchFilter(message) && this.doEmbedsMatchFilter(message);
    }
 
-   private passesContentFilter(message: Message): boolean {
+   private doesContentMatchFilter(message: Message): boolean {
       const content = message.content.toLowerCase();
       
       return this.type == FilterType.WHITELIST
@@ -51,7 +51,7 @@ export class Filter {
          : !this.keywords.some((keyword) => content.includes(keyword));
    }
 
-   private passesEmbedsFilter(message: Message): boolean {
+   private doEmbedsMatchFilter(message: Message): boolean {
       return message.embeds.every((embed) => this.passesEmbedFilter(embed));
    }
 
@@ -96,7 +96,7 @@ export class Filter {
    }
 
    private parseType(type: FilterConfig["type"]): FilterType {
-      switch (type) {
+      switch (type.toLocaleLowerCase()) {
          case "none":
             return FilterType.NONE;
          case "whitelist":
@@ -109,7 +109,7 @@ export class Filter {
    }
 
    private parseLocation(location: FilterConfig["where"]): FilterLocation {
-      switch (location) {
+      switch (location.toLocaleLowerCase()) {
          case "message":
             return FilterLocation.MESSAGE;
          case "post_tag":

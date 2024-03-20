@@ -151,6 +151,9 @@ export class Mirror {
    private fixInvalidEmbeds(message: Message): MessageEmbed[] {
       for (const embed of message.embeds) {
          for (const field of embed.fields) {
+            if (!field.name.length) {
+               field.name = "\u200B";
+            }
             if (!field.value.length) {
                field.value = "\u200B";
             }
