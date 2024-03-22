@@ -47,10 +47,10 @@ mirrors:
    # The following contains a mirror with its options.
    # Every option is optional and can be removed from this file if not required.
    1:
-      # You can find the id of a channel by enabling the Developer mode in your
-      # Discord account settings and Right-Click -> Copy ID on a channel.
+      # You can find the ID of a channel or category by enabling the Developer mode in your
+      # Discord account settings, then Right-Click -> Copy ID on the desired channel or category.
       #
-      # If you want to mirror thread channels, you can use the id of the parent channel.
+      # NOTE: You can also mirror categories and forums by using their IDs.
       channelIds:
          - "insert_channel_id_to_mirror_here"
       # Webhooks are used to send mirrored messages to specific channels.

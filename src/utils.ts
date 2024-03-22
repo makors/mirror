@@ -1,7 +1,7 @@
-import { ForumChannel, GuildMember, Message, MessageFlags, NewsChannel, TextChannel, ThreadChannel } from "discord.js-selfbot-v13";
+import { CategoryChannel, ForumChannel, GuildMember, Message, MessageFlags, NewsChannel, TextChannel, GuildChannel } from "discord.js-selfbot-v13";
 
-export function getParentChannel(message: Message): NewsChannel | TextChannel | ForumChannel | null {
-   return (message.channel instanceof ThreadChannel) ? (message.channel as ThreadChannel).parent ?? null : null;
+export function getParentChannel(message: Message): CategoryChannel | NewsChannel | TextChannel | ForumChannel | null {
+   return (message.channel instanceof GuildChannel) ? message.channel.parent ?? null : null;
 }
 
 export function memberHasRole(member: GuildMember, ...roleId: string[]): boolean {
