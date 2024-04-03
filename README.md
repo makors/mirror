@@ -45,11 +45,10 @@ logMessage: "[%date%] Mirrored @%author%'s message from %server% #%channel%."
 
 mirrors:
    # The following contains a mirror with its options.
-   # Every option is optional and can be removed from this file if not required.
+   # Every option inside the mirror is optional and can be removed from this file if not necessary.
    1:
-      # You can find the ID of a channel or category by enabling the Developer mode in your
-      # Discord account settings, then Right-Click -> Copy ID on the desired channel or category.
-      #
+      # You can find the ID of a channel by enabling the Developer mode in your
+      # Discord account settings, then Right-Click -> Copy ID on the desired channel.
       # NOTE: You can also mirror categories and forums by using their IDs.
       channelIds:
          - "insert_channel_id_to_mirror_here"
@@ -67,7 +66,7 @@ mirrors:
          minContentLength: 0
          minAttachmentsCount: 0
       options:
-         # Whether to use the webhook's profile picture and name to mirror messages.
+         # Whether to use the custom webhook profile picture and name to mirror messages.
          useWebhookProfile: false
          # Whether to remove attachments before mirroring a message.
          removeAttachments: false

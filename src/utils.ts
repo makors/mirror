@@ -44,6 +44,10 @@ export function isValidHexColor(color: string): boolean {
    return /^#[0-9A-F]{6}$/i.test(color);
 }
 
+export function isWildcardRegex(regex: RegExp): boolean {
+   return regex.source == "^(.|\\n)*";
+}
+
 export function hexColorsAreEqual(hexColorA: string, hexColorB: string, epsilon: number = 3000) {
    const colorA = parseInt(hexColorA.slice(1));
    const colorB = parseInt(hexColorB.slice(1));

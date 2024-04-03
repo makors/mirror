@@ -1,5 +1,5 @@
 import { HexColorString, Message } from "discord.js-selfbot-v13";
-import { hexColorsAreEqual, isValidHexColor } from "./utils";
+import { hexColorsAreEqual, isValidHexColor, isWildcardRegex } from "./utils";
 
 enum ReplacementLocation {
    EVERYWHERE = "everywhere",
@@ -72,7 +72,7 @@ class Replacement {
          case ReplacementLocation.EMBED_FOOTER_ICON_URL:
             return this.replaceEmbedFooterIconUrl;
          case ReplacementLocation.EMBED_COLOR: {
-            if (!isValidHexColor(this.replace.source)) {
+            if (!isWildcardRegex(this.replace) && !isValidHexColor(this.replace.source)) {
                throw new Error(`Invalid color in your config.yml (only hex is supported). Replace "${this.replace.source}" with a valid hex color (e.g. #3463D9) to fix this error.`);
             }
             if (!isValidHexColor(this.with)) {
@@ -162,7 +162,7 @@ class Replacement {
       for (const embed of message.embeds) {
          const embedColor = embed.hexColor ?? "#000000";
 
-         if (hexColorsAreEqual(embedColor, this.replace.source)) {
+         if (isWildcardRegex(this.replace) || hexColorsAreEqual(embedColor, this.replace.source)) {
             embed.setColor(this.with as HexColorString);
          }
       }
