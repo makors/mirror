@@ -55,7 +55,7 @@ mirrors:
       # Webhooks are used to send mirrored messages to specific channels.
       # You can create a webhook for a channel with: Edit channel -> Integrations -> Webhooks -> New webook.
       webhookUrls:
-         - "insert_destionation_webhook_url_here"
+         - "insert_destination_webhook_url_here"
       ignoredUserIds:
          - "insert_user_id_not_to_mirror_here"
       ignoredRoleIds:
