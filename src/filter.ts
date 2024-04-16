@@ -27,11 +27,9 @@ export class Filter {
     if (!Object.values(FilterType).includes(type)) {
       throw new Error(`Invalid filter type: ${type}`);
     }
-
     if (!Object.values(FilterLocation).includes(where)) {
       throw new Error(`Invalid filter location: ${where}`);
     }
-
     this.type = type;
     this.location = where;
     this.keywords = keywords.map((keyword) => keyword.toLowerCase());
@@ -49,7 +47,7 @@ export class Filter {
 
   private doesMessageMatchFilter(message: Message): boolean {
     return (
-      this.doesContentMatchFilter(message) && this.doEmbedsMatchFilter(message)
+      this.doesContentMatchFilter(message) || this.doEmbedsMatchFilter(message)
     );
   }
 
@@ -62,7 +60,10 @@ export class Filter {
   }
 
   private doEmbedsMatchFilter(message: Message): boolean {
-    return message.embeds.every((embed) => this.passesEmbedFilter(embed));
+    return (
+      message.embeds.length > 0 &&
+      message.embeds.every((embed) => this.passesEmbedFilter(embed))
+    );
   }
 
   private passesEmbedFilter(embed: MessageEmbed): boolean {
@@ -90,7 +91,6 @@ export class Filter {
     if (!parent) {
       return true;
     }
-
     if (parent.type !== "GUILD_FORUM") {
       return true;
     }
