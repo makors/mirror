@@ -2,120 +2,106 @@ import { Message, MessageEmbed, ThreadChannel } from "discord.js-selfbot-v13";
 import { getParentChannel } from "./utils";
 
 enum FilterType {
-   NONE,
-   WHITELIST,
-   BLACKLIST
+  NONE = "none",
+  WHITELIST = "whitelist",
+  BLACKLIST = "blacklist",
 }
 
 enum FilterLocation {
-   MESSAGE,
-   POST_TAG
+  MESSAGE = "message",
+  POST_TAG = "post_tag",
 }
 
 export interface FilterConfig {
-   type: "none" | "whitelist" | "blacklist";
-   keywords: string[];
-   where: "message" | "post_tag";
+  type: FilterType;
+  keywords: string[];
+  where: FilterLocation;
 }
 
 export class Filter {
-   private type: FilterType;
-   private location: FilterLocation;
-   private keywords: string[];
+  private type: FilterType;
+  private location: FilterLocation;
+  private keywords: string[];
 
-   public constructor({ type, keywords, where }: FilterConfig) {
-      this.type = this.parseType(type);
-      this.location = this.parseLocation(where);
-      this.keywords = keywords.map((keyword) => keyword.toLowerCase());
-   }
+  public constructor({ type, keywords, where }: FilterConfig) {
+    if (!Object.values(FilterType).includes(type)) {
+      throw new Error(`Invalid filter type: ${type}`);
+    }
 
-   public doesMatchFilter(message: Message): boolean {
-      if (this.type == FilterType.NONE) {
-         return true;
-      }
+    if (!Object.values(FilterLocation).includes(where)) {
+      throw new Error(`Invalid filter location: ${where}`);
+    }
 
-      return this.location == FilterLocation.MESSAGE
-         ? this.doesMessageMatchFilter(message)
-         : this.doesTagMatchFilter(message);
-   }
+    this.type = type;
+    this.location = where;
+    this.keywords = keywords.map((keyword) => keyword.toLowerCase());
+  }
 
-   private doesMessageMatchFilter(message: Message): boolean {
-      return this.doesContentMatchFilter(message) && this.doEmbedsMatchFilter(message);
-   }
+  public doesMatchFilter(message: Message): boolean {
+    if (this.type == FilterType.NONE) {
+      return true;
+    }
 
-   private doesContentMatchFilter(message: Message): boolean {
-      const content = message.content.toLowerCase();
-      
-      return this.type == FilterType.WHITELIST
-         ? this.keywords.some((keyword) => content.includes(keyword))
-         : !this.keywords.some((keyword) => content.includes(keyword));
-   }
+    return this.location == FilterLocation.MESSAGE
+      ? this.doesMessageMatchFilter(message)
+      : this.doesTagMatchFilter(message);
+  }
 
-   private doEmbedsMatchFilter(message: Message): boolean {
-      return message.embeds.every((embed) => this.passesEmbedFilter(embed));
-   }
+  private doesMessageMatchFilter(message: Message): boolean {
+    return (
+      this.doesContentMatchFilter(message) && this.doEmbedsMatchFilter(message)
+    );
+  }
 
-   private passesEmbedFilter(embed: MessageEmbed): boolean {
-      return this.type == FilterType.WHITELIST
-         ? this.embedContainsSomeKeywords(embed)
-         : !this.embedContainsSomeKeywords(embed);
-   }
+  private doesContentMatchFilter(message: Message): boolean {
+    const content = message.content.toLowerCase();
 
-   private embedContainsSomeKeywords(embed: MessageEmbed): boolean {
-      const content = [
-         embed.title,
-         embed.description,
-         embed.fields.map((field) => field.name + field.value).join(""),
-         embed.footer?.text,
-         embed.author?.name,
-      ]
-         .join("")
-         .toLowerCase();
+    return this.type == FilterType.WHITELIST
+      ? this.keywords.some((keyword) => content.includes(keyword))
+      : !this.keywords.some((keyword) => content.includes(keyword));
+  }
 
-      return this.keywords.some((keyword) => content.includes(keyword));
-   }
+  private doEmbedsMatchFilter(message: Message): boolean {
+    return message.embeds.every((embed) => this.passesEmbedFilter(embed));
+  }
 
-   private doesTagMatchFilter(message: Message): boolean {
-      const parent = getParentChannel(message);
-      if (!parent) {
-         return true;
-      }
+  private passesEmbedFilter(embed: MessageEmbed): boolean {
+    return this.type == FilterType.WHITELIST
+      ? this.embedContainsSomeKeywords(embed)
+      : !this.embedContainsSomeKeywords(embed);
+  }
 
-      if (parent.type !== "GUILD_FORUM") {
-         return true;
-      }
+  private embedContainsSomeKeywords(embed: MessageEmbed): boolean {
+    const content = [
+      embed.title,
+      embed.description,
+      embed.fields.map((field) => field.name + field.value).join(""),
+      embed.footer?.text,
+      embed.author?.name,
+    ]
+      .join("")
+      .toLowerCase();
 
-      const channel = message.channel as ThreadChannel;
-      const tags = parent.availableTags
-         .filter((tag) => channel.appliedTags.includes(tag.id))
-         .map((tag) => tag.name.toLowerCase());
+    return this.keywords.some((keyword) => content.includes(keyword));
+  }
 
-      return this.type == FilterType.WHITELIST
-         ? this.keywords.some((keyword) => tags.includes(keyword))
-         : !this.keywords.some((keyword) => tags.includes(keyword));
-   }
+  private doesTagMatchFilter(message: Message): boolean {
+    const parent = getParentChannel(message);
+    if (!parent) {
+      return true;
+    }
 
-   private parseType(type: FilterConfig["type"]): FilterType {
-      switch (type.toLocaleLowerCase()) {
-         case "none":
-            return FilterType.NONE;
-         case "whitelist":
-            return FilterType.WHITELIST;
-         case "blacklist":
-            return FilterType.BLACKLIST;
-         default:
-            throw new Error(`Invalid filter type: ${type}`);
-      }
-   }
+    if (parent.type !== "GUILD_FORUM") {
+      return true;
+    }
 
-   private parseLocation(location: FilterConfig["where"]): FilterLocation {
-      switch (location.toLocaleLowerCase()) {
-         case "message":
-            return FilterLocation.MESSAGE;
-         case "post_tag":
-            return FilterLocation.POST_TAG;
-         default:
-            throw new Error(`Invalid filter location: ${location}`);
-      }
-   }
+    const channel = message.channel as ThreadChannel;
+    const tags = parent.availableTags
+      .filter((tag) => channel.appliedTags.includes(tag.id))
+      .map((tag) => tag.name.toLowerCase());
+
+    return this.type == FilterType.WHITELIST
+      ? this.keywords.some((keyword) => tags.includes(keyword))
+      : !this.keywords.some((keyword) => tags.includes(keyword));
+  }
 }
