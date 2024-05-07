@@ -23,19 +23,21 @@ export class MirrorClient extends Client {
   private mirrors: Map<ChannelId, Mirror> = new Map();
 
   public constructor(config: Config) {
-    super({ checkUpdate: false });
+    super({
+      checkUpdate: false,
+      presence: {
+        status: config.getStatus() as PresenceStatusData,
+      },
+    });
     this.config = config;
     this.loadMirrors();
 
     this.on("ready", () => this.onReady());
     this.on("messageCreate", (message) => this.onMessageCreate(message));
-    this.on("messageUpdate", (oldMessage, newMessage) =>
-      this.onMessageUpdate(oldMessage, newMessage)
-    );
+    this.on("messageUpdate", (oldMessage, newMessage) => this.onMessageUpdate(oldMessage, newMessage));
   }
 
   private onReady(): void {
-    this.user!.setStatus(this.config.getStatus() as PresenceStatusData);
     console.log(`${this.user?.username} is now mirroring >:)!`);
   }
 

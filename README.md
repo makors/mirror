@@ -33,7 +33,7 @@ Each option in `config.yml` is either self explanatory or has a comment above de
 token: "insert_your_token_here"
 
 # Status of the account that will mirror messages.
-# Available options: online, offline, idle, dnd.
+# Available options: online, invisible, idle, dnd.
 #
 # Note that you should not be logged into the account
 # when the bot starts for this option to take effect.
