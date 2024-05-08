@@ -198,7 +198,7 @@ export class Mirror {
   }
 
   private doesMatchFilter(message: Message): boolean {
-    return this.filter != undefined && this.filter.doesMatchFilter(message);
+    return !this.filter || this.filter.doesMatchFilter(message);
   }
 
   private stripMessage(message: Message): boolean {
