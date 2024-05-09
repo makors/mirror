@@ -137,16 +137,6 @@ mirrors:
       # ───────────────────────────────────────────────────────────────────────────────────────────────── #
 ```
 
-# Docker Setup
-If you wish to setup and use the bot via Docker, follow this steps:
-
-1. Install [Docker](https://docs.docker.com/get-docker/).
-2. Clone this repository.
-3. Enter the repository folder.
-4. Configure `config.yml`.
-5. Run `docker build -t discord-mirror-bot .` to build the Docker image.
-6. Run `docker run -d discord-mirror-bot` to run the Docker image (this starts a container with your bot running inside it).
-
 # Disclaimer
 
 Note that using a Discord self bot is against the Discord TOS, and i take no responsibility for any consequences that may arise from using it.
