@@ -31,8 +31,7 @@ class Replacement {
   private applyCallback: (message: Message) => void;
 
   public constructor(config: ReplacementConfig) {
-    this.replace =
-      config.replace == "*" ? /^(.|\n)*/g : new RegExp(config.replace, "gi");
+    this.replace = config.replace == "*" ? /^(.|\n)*/g : new RegExp(config.replace, "gi");
     this.with = config.with;
     this.applyCallback = this.createApplyCallback(config.where);
   }

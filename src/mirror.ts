@@ -1,6 +1,6 @@
 import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
-import { Filter, FilterConfig } from "./filter";
+import { FilterConfig, Filters } from "./filters";
 import {
   Message,
   MessageEmbed,
@@ -69,7 +69,7 @@ export interface MirrorConfig {
   requirements?: MirrorConfigRequirements;
   options?: MirrorConfigOptions;
   replacements?: Record<number, ReplacementConfig>;
-  filter?: FilterConfig;
+  filters?: Record<number, FilterConfig>;
 }
 
 export class Mirror {
@@ -79,7 +79,7 @@ export class Mirror {
   private mirrorRequirements: MirrorRequirements;
   private mirrorOptions: MirrorOptions;
   private replacements: MirrorReplacements;
-  private filter: Filter | undefined;
+  private filters: Filters;
 
   public constructor({
     webhookUrls = [],
@@ -88,7 +88,7 @@ export class Mirror {
     requirements = {},
     options = {},
     replacements = {},
-    filter,
+    filters = {},
   }: MirrorConfig) {
     this.loadWebhooks(webhookUrls);
     this.ignoredUserIds = new Set(ignoredUserIds);
@@ -96,14 +96,14 @@ export class Mirror {
     this.mirrorRequirements = new MirrorRequirements(requirements);
     this.mirrorOptions = new MirrorOptions(options);
     this.replacements = new MirrorReplacements(replacements);
-    this.filter = filter ? new Filter(filter) : undefined;
+    this.filters = new Filters(filters);
   }
 
   public shouldMirror(message: Message, isUpdate: boolean): boolean {
     return (
       this.messageMeetsOptions(message, isUpdate) &&
       this.messageMeetsRequirements(message) &&
-      this.doesMatchFilter(message) &&
+      this.messageMatchFilters(message) &&
       this.stripMessage(message)
     );
   }
@@ -192,13 +192,12 @@ export class Mirror {
       message.embeds.length >= this.mirrorRequirements.minEmbedsCount &&
       message.attachments.size >= this.mirrorRequirements.minAttachmentsCount &&
       !(message.author.id in this.ignoredUserIds) &&
-      (message.member == null ||
-        !memberHasRole(message.member, ...this.ignoredRoleIds))
+      (!message.member || !memberHasRole(message.member, ...this.ignoredRoleIds))
     );
   }
 
-  private doesMatchFilter(message: Message): boolean {
-    return !this.filter || this.filter.doesMatchFilter(message);
+  private messageMatchFilters(message: Message): boolean {
+    return this.filters.match(message);
   }
 
   private stripMessage(message: Message): boolean {
