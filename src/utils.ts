@@ -1,7 +1,6 @@
 import {
   CategoryChannel,
   ForumChannel,
-  GuildMember,
   Message,
   MessageFlags,
   NewsChannel,
@@ -11,10 +10,6 @@ import {
 
 export function getParentChannel(message: Message): CategoryChannel | NewsChannel | TextChannel | ForumChannel | null {
   return (message.channel instanceof GuildChannel) ? message.channel.parent ?? null : null;
-}
-
-export function memberHasRole(member: GuildMember, ...roleId: string[]): boolean {
-  return member.roles.cache.hasAny(...roleId);
 }
 
 export function isPublishedMessage(message: Message): boolean {

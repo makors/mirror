@@ -1,4 +1,4 @@
-import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
+import { containsOnlyAttachments, isGif } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
 import { FilterConfig, MirrorFilters } from "./filters";
 import {
@@ -64,8 +64,6 @@ class MirrorOptions {
 export interface MirrorConfig {
   channelIds?: string[];
   webhookUrls?: string[];
-  ignoredUserIds?: string[];
-  ignoredRoleIds?: string[];
   requirements?: MirrorConfigRequirements;
   options?: MirrorConfigOptions;
   replacements?: Record<number, ReplacementConfig>;
@@ -74,8 +72,6 @@ export interface MirrorConfig {
 
 export class Mirror {
   private webhooks: WebhookClient[] = [];
-  private ignoredUserIds: Set<string>;
-  private ignoredRoleIds: string[];
   private mirrorRequirements: MirrorRequirements;
   private mirrorOptions: MirrorOptions;
   private replacements: MirrorReplacements;
@@ -83,16 +79,12 @@ export class Mirror {
 
   public constructor({
     webhookUrls = [],
-    ignoredUserIds,
-    ignoredRoleIds = [],
     requirements = {},
     options = {},
     replacements = {},
     filters = {},
   }: MirrorConfig) {
     this.loadWebhooks(webhookUrls);
-    this.ignoredUserIds = new Set(ignoredUserIds);
-    this.ignoredRoleIds = ignoredRoleIds;
     this.mirrorRequirements = new MirrorRequirements(requirements);
     this.mirrorOptions = new MirrorOptions(options);
     this.replacements = new MirrorReplacements(replacements);
@@ -143,7 +135,7 @@ export class Mirror {
     };
     if (!this.mirrorOptions.useWebhookProfile) {
       payload.username = message.author.username;
-      payload.avatarURL = message.author?.avatarURL() ?? undefined;
+      payload.avatarURL = message.author.avatarURL() ?? undefined;
     }
     payloads.push(payload);
 
@@ -190,9 +182,7 @@ export class Mirror {
     return (
       message.content.length >= this.mirrorRequirements.minContentLength &&
       message.embeds.length >= this.mirrorRequirements.minEmbedsCount &&
-      message.attachments.size >= this.mirrorRequirements.minAttachmentsCount &&
-      !(message.author.id in this.ignoredUserIds) &&
-      (!message.member || !memberHasRole(message.member, ...this.ignoredRoleIds))
+      message.attachments.size >= this.mirrorRequirements.minAttachmentsCount
     );
   }
 
