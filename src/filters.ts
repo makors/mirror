@@ -138,7 +138,7 @@ class Filter {
   }
 }
 
-export class Filters {
+export class MirrorFilters {
   private filters: Filter[] = [];
 
   public constructor(filtersConfig: Record<number, FilterConfig>) {

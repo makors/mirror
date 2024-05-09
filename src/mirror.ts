@@ -1,6 +1,6 @@
 import { containsOnlyAttachments, isGif, memberHasRole } from "./utils";
 import { MirrorReplacements, ReplacementConfig } from "./replacements";
-import { FilterConfig, Filters } from "./filters";
+import { FilterConfig, MirrorFilters } from "./filters";
 import {
   Message,
   MessageEmbed,
@@ -79,7 +79,7 @@ export class Mirror {
   private mirrorRequirements: MirrorRequirements;
   private mirrorOptions: MirrorOptions;
   private replacements: MirrorReplacements;
-  private filters: Filters;
+  private filters: MirrorFilters;
 
   public constructor({
     webhookUrls = [],
@@ -96,7 +96,7 @@ export class Mirror {
     this.mirrorRequirements = new MirrorRequirements(requirements);
     this.mirrorOptions = new MirrorOptions(options);
     this.replacements = new MirrorReplacements(replacements);
-    this.filters = new Filters(filters);
+    this.filters = new MirrorFilters(filters);
   }
 
   public shouldMirror(message: Message, isUpdate: boolean): boolean {
