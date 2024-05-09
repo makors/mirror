@@ -103,7 +103,7 @@ export class MirrorClient extends Client {
     console.log(
       logMessage
         .replace("%date%", new Date().toLocaleString())
-        .replace("%author%", message?.author?.username ?? "unknown")
+        .replace("%author%", message.author.username)
         .replace("%server%", message.guild!.name)
         .replace("%channel%", (message.channel as TextChannel).name)
     );
