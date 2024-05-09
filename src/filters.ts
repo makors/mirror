@@ -2,7 +2,6 @@ import { Message, MessageEmbed, ThreadChannel } from "discord.js-selfbot-v13";
 import { getParentChannel } from "./utils";
 
 enum FilterType {
-  NONE = "none",
   WHITELIST = "whitelist",
   BLACKLIST = "blacklist",
 }
@@ -39,10 +38,6 @@ class Filter {
   }
 
   public match(message: Message): boolean {
-    if (this.type == FilterType.NONE) {
-      return true;
-    }
-
     switch (this.location) {
       case FilterLocation.MESSAGE:
         return this.messageMatches(message);
