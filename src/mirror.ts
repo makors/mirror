@@ -139,7 +139,7 @@ export class Mirror {
     }
     payloads.push(payload);
 
-    const chunks = Math.floor(message.content.length / (maxContentLength + 1));
+    const chunks = Math.floor((message.content.length - 1) / maxContentLength);
     for (let i = 0; i < chunks; i++) {
       const payload: MessagePayload | WebhookMessageOptions = {
         content: message.content.substring(
