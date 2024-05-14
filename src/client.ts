@@ -58,7 +58,7 @@ export class MirrorClient extends Client {
     if (!this.isMirrorableMessage(message)) {
       return;
     }
-    let mirror = this.getMirrorFromMessage(message);
+    const mirror = this.getMirrorFromMessage(message);
     if (!mirror) {
       return;
     }
