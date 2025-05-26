@@ -1,8 +1,7 @@
-FROM node:latest
+FROM oven/bun:latest
 WORKDIR /usr/src/app
 COPY package*.json config.yml tsconfig.json ./
-RUN npm install -g pnpm
-RUN pnpm install
+RUN bun install
 COPY . .
-RUN pnpm run build
-CMD [ "pnpm", "start" ]
+RUN bun run build
+CMD [ "bun", "start" ]
